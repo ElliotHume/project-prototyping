@@ -16,5 +16,6 @@ namespace _Prototyping.Interactions.Core
 		public void FinishInteraction(IInteractor<T> interactor);
 
 		public bool CanBeInteractedWith(IInteractor<T> interactor);
+		
 	}
 }
