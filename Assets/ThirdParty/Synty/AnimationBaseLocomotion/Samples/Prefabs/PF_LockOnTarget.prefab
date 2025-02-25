@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 1687389468029486088}
   - component: {fileID: 8382707033464953195}
   - component: {fileID: 7840098101452780963}
-  m_Layer: 0
+  - component: {fileID: 2225337115300417136}
+  m_Layer: 6
   m_Name: PF_LockOnTarget
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27,14 +28,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7970418746432737881}
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 935101951927277405}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3877099135956955093
 MeshFilter:
@@ -61,6 +62,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -98,8 +102,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75ec016dd7c8fec49afb4be540ee2566, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _highlightMat: {fileID: 0}
-  _targetMat: {fileID: 0}
+  _highlightMat: {fileID: 2100000, guid: 28eaf3798c4f9344c9a904585a85ce68, type: 2}
+  _targetMat: {fileID: 2100000, guid: 55ea3f8e4aa78cf4f9c029c608b7cc4c, type: 2}
 --- !u!135 &7840098101452780963
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -119,8 +123,21 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 10
+  m_Radius: 1
   m_Center: {x: 0.012273416, y: 0.8712123, z: 0.020802151}
+--- !u!114 &2225337115300417136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7970418746432737881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 165f210720434cb9b73684fc3524b8cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <rootGameObject>k__BackingField: {fileID: 0}
 --- !u!1 &8807091686036453338
 GameObject:
   m_ObjectHideFlags: 0
@@ -134,7 +151,7 @@ GameObject:
   - component: {fileID: 3801837885297601579}
   - component: {fileID: 6473514595230539277}
   - component: {fileID: 2512549320460829501}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: TargetHighlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -154,7 +171,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6357524280168560302}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -186,6 +202,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using _Prototyping.Utilities;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -10,43 +11,82 @@ namespace _Prototyping.Interactions.PlayerInteractions
 		private PlayerProximityInteractor _proximityInteractor;
 
 		[SerializeField]
-		private OutlineSettingsConfig _outlineSettings;
+		private OutlineSettingsConfig _hoveredOutlineSettings;
+		[SerializeField]
+		private OutlineSettingsConfig _selectedOutlineSettings;
 
 		[CanBeNull]
 		private PlayerProximityInteractable _outlinedTarget = null;
 
-		private Outline _outline;
+		private Dictionary<PlayerProximityInteractable, Outline> _outlines;
 
-		private void Update()
+		private void Start()
 		{
-			PlayerProximityInteractable currentInteractable = _proximityInteractor.currentInteractable;
-			if (currentInteractable != _outlinedTarget)
+			_proximityInteractor.OnStartHover += OnStartHover;
+			_proximityInteractor.OnEndHover += OnEndHover;
+			
+			_proximityInteractor.OnStartInteraction += OnStartInteraction;
+			_proximityInteractor.OnEndInteraction += OnEndInteraction;
+
+			_outlines = new Dictionary<PlayerProximityInteractable, Outline>();
+		}
+
+		private void OnStartHover(PlayerProximityInteractable interactable)
+		{
+			AddOutlineToTarget(interactable, _hoveredOutlineSettings);
+		}
+		
+		private void OnEndHover(PlayerProximityInteractable interactable)
+		{
+			RemoveOutlineFromTarget(interactable);
+		}
+		
+		private void OnStartInteraction(PlayerProximityInteractable interactable)
+		{
+			AddOutlineToTarget(interactable, _selectedOutlineSettings);
+		}
+		
+		private void OnEndInteraction(PlayerProximityInteractable interactable)
+		{
+			// Reset back to a hovered outline, only if the outline is still present
+			if (_outlines.TryGetValue(interactable, out Outline outline))
 			{
-				if (_outlinedTarget != null)
-					RemoveOutlineFromTarget();
-
-				if (currentInteractable != null)
-					AddOutlineToTarget(currentInteractable);
-
-				_outlinedTarget = _proximityInteractor.currentInteractable;
+				outline.OutlineMode = _hoveredOutlineSettings.outlineMode;
+				outline.OutlineColor = _hoveredOutlineSettings.outlineColor;
+				outline.OutlineWidth = _hoveredOutlineSettings.outlineWidth;
 			}
 		}
 
-		private void RemoveOutlineFromTarget()
+		private void RemoveOutlineFromTarget(PlayerProximityInteractable interactable)
 		{
-			if (_outline != null)
+			if (_outlines.TryGetValue(interactable, out Outline outline))
 			{
-				Destroy(_outline);
-				_outline = null;
+				Destroy(outline);
+				_outlines.Remove(interactable);
 			}
 		}
 
-		private void AddOutlineToTarget(PlayerProximityInteractable interactable)
+		private void AddOutlineToTarget(PlayerProximityInteractable interactable, OutlineSettingsConfig outlineSettingsConfig)
 		{
-			_outline = interactable.gameObject.AddComponent<Outline>();
-			_outline.OutlineMode = _outlineSettings.outlineMode;
-			_outline.OutlineColor = _outlineSettings.outlineColor;
-			_outline.OutlineWidth = _outlineSettings.outlineWidth;
+			if (interactable == null)
+				return;
+			
+			if (_outlines.TryGetValue(interactable, out Outline outline))
+			{
+				outline.OutlineMode = outlineSettingsConfig.outlineMode;
+				outline.OutlineColor = outlineSettingsConfig.outlineColor;
+				outline.OutlineWidth = outlineSettingsConfig.outlineWidth;
+			}
+			else
+			{
+				Outline newOutline = interactable.gameObject.AddComponent<Outline>();
+				newOutline.OutlineMode = outlineSettingsConfig.outlineMode;
+				newOutline.OutlineColor = outlineSettingsConfig.outlineColor;
+				newOutline.OutlineWidth = outlineSettingsConfig.outlineWidth;
+				
+				_outlines.Add(interactable, newOutline);
+			}
+			
 		}
 	}
 }

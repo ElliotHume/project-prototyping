@@ -36,6 +36,8 @@ namespace Synty.AnimationBaseLocomotion.Samples.InputSystem
         public Action onSprintDeactivated;
 
         public Action onWalkToggled;
+        
+        public Action onInteracted;
 
         /// <inheritdoc cref="OnEnable" />
         private void OnEnable()
@@ -164,6 +166,16 @@ namespace Synty.AnimationBaseLocomotion.Samples.InputSystem
 
             onLockOnToggled?.Invoke();
             onSprintDeactivated?.Invoke();
+        }
+
+        public void OnInteract(InputAction.CallbackContext context)
+        {
+            if (!context.performed)
+            {
+                return;
+            }
+
+            onInteracted?.Invoke();
         }
     }
 }
