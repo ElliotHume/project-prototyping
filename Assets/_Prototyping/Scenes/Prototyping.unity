@@ -615,7 +615,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <rootGameObject>k__BackingField: {fileID: 827805524}
   <collider>k__BackingField: {fileID: 827805526}
-  _velocityDampingWhenHeld: 3
 --- !u!1 &321796822 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 57aa70f76bbc9b2449b73a761ecbb286, type: 3}
@@ -1184,7 +1183,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <rootGameObject>k__BackingField: {fileID: 1467091933}
   <collider>k__BackingField: {fileID: 1467091935}
-  _velocityDampingWhenHeld: 3
 --- !u!1 &565837087
 GameObject:
   m_ObjectHideFlags: 0
@@ -2070,7 +2068,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <rootGameObject>k__BackingField: {fileID: 1897520684}
   <collider>k__BackingField: {fileID: 1897520686}
-  _velocityDampingWhenHeld: 3
 --- !u!1001 &937992669
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2527,6 +2524,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d5e6aa8954883f149b6e56d5b5e44b0d, type: 3}
+--- !u!4 &1205793875 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 68991378307973460, guid: a3a751c3ff9cf31489769e2f5e3a4f51, type: 3}
+  m_PrefabInstance: {fileID: 1519860327}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1222771070
 GameObject:
   m_ObjectHideFlags: 0
@@ -2536,6 +2538,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1222771071}
+  - component: {fileID: 1222771072}
   m_Layer: 7
   m_Name: PickupPoint
   m_TagString: Untagged
@@ -2558,6 +2561,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 88422546}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1222771072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1222771070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33d2bb24cd3640a7a222615c179e6be9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sourceTransform: {fileID: 1205793875}
+  _position: 0
+  _rotation: 1
 --- !u!1 &1251416504 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 5abba8dc21f730a48bd010f01c3eeddc, type: 3}
@@ -3694,7 +3712,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <rootGameObject>k__BackingField: {fileID: 1856184796}
   <collider>k__BackingField: {fileID: 1856184798}
-  _velocityDampingWhenHeld: 3
 --- !u!4 &1774692631 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6357524280168560302, guid: c034f6fb61331224682b4f900e476c66, type: 3}
@@ -4057,7 +4074,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <rootGameObject>k__BackingField: {fileID: 1784581505}
   <collider>k__BackingField: {fileID: 1784581506}
-  _velocityDampingWhenHeld: 3
 --- !u!1001 &1852883068
 PrefabInstance:
   m_ObjectHideFlags: 0

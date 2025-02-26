@@ -171,7 +171,12 @@ namespace _Prototyping.Interactions.PlayerInteractions
 					}
 
 					Transform pickupPoint = _pickupTransformPositions[i];
-					pickedUpObject.rootGameObject.transform.position = Vector3.Lerp(pickedUpObject.rootGameObject.transform.position,pickupPoint.position,Time.deltaTime * _holdForce);
+					pickedUpObject.rootGameObject.transform.position = Vector3.Lerp(
+						pickedUpObject.rootGameObject.transform.position, pickupPoint.position,
+						Time.deltaTime * _holdForce);
+					pickedUpObject.rootGameObject.transform.rotation = Quaternion.Lerp(
+						pickedUpObject.rootGameObject.transform.rotation, pickupPoint.rotation,
+						Time.deltaTime * _holdForce);
 				}
 			}
 		}
