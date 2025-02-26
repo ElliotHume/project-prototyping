@@ -32,34 +32,33 @@ namespace _Prototyping.Interactions.PlayerInteractions
 				rootGameObject = gameObject;
 			
 			if (collider == null)
-				collider = GetComponent<Collider>();
+				collider = GetComponentInParent<Collider>();
 		}
 
-		public void StartInteraction(IInteractor<PlayerProximityInteractable> interactor)
+		public virtual void StartInteraction(IInteractor<PlayerProximityInteractable> interactor)
 		{
 			OnStartInteraction?.Invoke(interactor);
 			currentInteractor = interactor as PlayerProximityInteractor;
 		}
 
-		public void EndInteraction(IInteractor<PlayerProximityInteractable> interactor)
+		public virtual void EndInteraction(IInteractor<PlayerProximityInteractable> interactor)
 		{
 			OnEndInteraction?.Invoke(interactor);
 			currentInteractor = null;
 		}
 
-		public void StartHover(IInteractor<PlayerProximityInteractable> interactor)
+		public virtual void StartHover(IInteractor<PlayerProximityInteractable> interactor)
 		{
 			OnStartHover?.Invoke(interactor);
 		}
 
-		public void EndHover(IInteractor<PlayerProximityInteractable> interactor)
+		public virtual void EndHover(IInteractor<PlayerProximityInteractable> interactor)
 		{
 			OnEndHover?.Invoke(interactor);
 		}
 
-		public bool CanBeInteractedWith(IInteractor<PlayerProximityInteractable> interactor)
+		public virtual bool CanBeInteractedWith(IInteractor<PlayerProximityInteractable> interactor)
 		{
-			Debug.Log("CHECK IF CAN INTERACT", gameObject);
 			return currentInteractor == null;
 		}
 	}

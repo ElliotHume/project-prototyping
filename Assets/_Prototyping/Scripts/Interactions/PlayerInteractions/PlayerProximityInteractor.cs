@@ -66,11 +66,14 @@ namespace _Prototyping.Interactions.PlayerInteractions
 		{
 			OnStartInteraction?.Invoke(interactable);
 			currentInteractable = interactable;
+			currentInteractable.StartInteraction(this);
 		}
 
 		public void EndInteraction(PlayerProximityInteractable interactable)
 		{
 			OnEndInteraction?.Invoke(interactable);
+			currentInteractable.EndInteraction(this);
+			
 			currentInteractable = null;
 		}
 
@@ -106,7 +109,6 @@ namespace _Prototyping.Interactions.PlayerInteractions
 				{
 					EndInteraction(currentInteractable);
 				}
-					
 			}
 			else
 			{
@@ -138,7 +140,12 @@ namespace _Prototyping.Interactions.PlayerInteractions
 			{
 				Collider hitCollider = _sphereCastResults[i];
 				float sqrDistanceToCollider = Vector3.SqrMagnitude(hitCollider.bounds.center - transform.position);
-				if (sqrDistanceToCollider < closestColliderDistance && hitCollider.gameObject.TryGetComponent(out PlayerProximityInteractable playerProximityInteractable))
+				PlayerProximityInteractable playerProximityInteractable =
+					hitCollider.gameObject.GetComponentInChildren<PlayerProximityInteractable>();
+				
+				if (sqrDistanceToCollider < closestColliderDistance
+					&& playerProximityInteractable != null
+					&& CanInteractWith(playerProximityInteractable))
 				{
 					closestColliderDistance = sqrDistanceToCollider;
 					closestInteractable = playerProximityInteractable;

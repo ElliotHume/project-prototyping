@@ -15,9 +15,6 @@ namespace _Prototyping.Interactions.PlayerInteractions
 		[SerializeField]
 		private OutlineSettingsConfig _selectedOutlineSettings;
 
-		[CanBeNull]
-		private PlayerProximityInteractable _outlinedTarget = null;
-
 		private Dictionary<PlayerProximityInteractable, Outline> _outlines;
 
 		private void Start()
