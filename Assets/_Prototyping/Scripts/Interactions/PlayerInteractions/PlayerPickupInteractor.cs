@@ -48,7 +48,7 @@ namespace _Prototyping.Interactions.PlayerInteractions
 		
 		public bool isInteracting => pickedUpObjects.Count > 0;
 		public bool isHovering => hoveredInteractable != null;
-		public bool isLowPriority => isInteracting && !isHovering;
+		public int priority => isInteracting && !isHovering ? 1 : 0;
 
 		private float _sqrProxStartDistance;
 		private float _sqrProxStopDistance;

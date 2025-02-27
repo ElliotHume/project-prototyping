@@ -22,13 +22,7 @@ namespace _Prototyping.Interactions.PlayerInteractions
 
 		private void OnInteracted()
 		{
-			foreach (SerializableUnityRef<IBaseInteractor> interactor in _interactorsInPriorityOrder.Where((i) => i.hasValue && !i.value.isLowPriority))
-			{
-				if (interactor.value.OnInteractInputPressed())
-					return;
-			}
-			
-			foreach (SerializableUnityRef<IBaseInteractor> interactor in _interactorsInPriorityOrder.Where((i) => i.hasValue && i.value.isLowPriority))
+			foreach (SerializableUnityRef<IBaseInteractor> interactor in _interactorsInPriorityOrder.OrderBy((i) => i.value.priority))
 			{
 				if (interactor.value.OnInteractInputPressed())
 					return;

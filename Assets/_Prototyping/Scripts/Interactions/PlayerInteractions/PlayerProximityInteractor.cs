@@ -30,7 +30,7 @@ namespace _Prototyping.Interactions.PlayerInteractions
 
 		public bool isInteracting => currentInteractable != null;
 		public bool isHovering => hoveredInteractable != null;
-		public bool isLowPriority => false;
+		public int priority => 0;
 		
 		private float _sqrProxDistance;
 		private Collider[] _sphereCastResults;

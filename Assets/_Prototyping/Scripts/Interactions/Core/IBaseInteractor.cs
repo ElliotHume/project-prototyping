@@ -5,7 +5,7 @@ namespace _Prototyping.Interactions.Core
 		public bool isInteracting { get; }
 		public bool isHovering { get; }
 
-		public bool isLowPriority { get; }
+		public int priority { get; }
 
 		/// <summary>
 		/// 
