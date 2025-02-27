@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace _Prototyping.Interactions.Core
 {
-	public interface IInteractor<T> where T : IInteractable<T>
+	public interface IInteractor<T> : IBaseInteractor where T : IInteractable<T> 
 	{
 		[CanBeNull]
 		public T CurrentInteractable { get; }

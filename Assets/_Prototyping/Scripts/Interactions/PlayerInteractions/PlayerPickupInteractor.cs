@@ -24,8 +24,6 @@ namespace _Prototyping.Interactions.PlayerInteractions
 
 		#endregion
 		
-		[SerializeField]
-		private InputReader _inputReader;
 
 		[SerializeField]
 		private List<Transform> _pickupTransformPositions;
@@ -50,6 +48,7 @@ namespace _Prototyping.Interactions.PlayerInteractions
 		
 		public bool isInteracting => pickedUpObjects.Count > 0;
 		public bool isHovering => hoveredInteractable != null;
+		public bool isLowPriority => isInteracting && !isHovering;
 
 		private float _sqrProxStartDistance;
 		private float _sqrProxStopDistance;
@@ -62,11 +61,6 @@ namespace _Prototyping.Interactions.PlayerInteractions
 			_sqrProxStartDistance = _proximityStartDistance * _proximityStartDistance;
 			_sqrProxStopDistance = _proximityStopDistance * _proximityStopDistance;
 			_sphereCastResults = new Collider[5];
-		}
-
-		private void Start()
-		{
-			_inputReader.onInteracted += OnInteractedButtonPressed;
 		}
 
 		private void SetHover(PlayerPickupInteractable interactable)
@@ -110,6 +104,7 @@ namespace _Prototyping.Interactions.PlayerInteractions
 
 		public void EndInteraction(PlayerPickupInteractable interactable)
 		{
+			Debug.Log("End Interaction with: "+interactable.rootGameObject, interactable);
 			if (interactable == null)
 			{
 				Debug.LogError($"[{nameof(PlayerPickupInteractor)}] Tried to end an interaction with an interactable that is null");
@@ -181,17 +176,23 @@ namespace _Prototyping.Interactions.PlayerInteractions
 			}
 		}
 		
-		private void OnInteractedButtonPressed()
+		public bool OnInteractInputPressed()
 		{
 			if (hoveredInteractable != null)
 			{
 				StartInteraction(hoveredInteractable);
+				return true;
 			}
 			else
 			{
 				if (pickedUpObjects.Count > 0)
+				{
 					EndInteraction(pickedUpObjects.Last());
+					return true;
+				}
 			}
+
+			return false;
 		}
 
 		private void ProcessHovers()

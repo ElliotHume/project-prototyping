@@ -21,9 +21,6 @@ namespace _Prototyping.Interactions.PlayerInteractions
 		public Action<PlayerProximityInteractable> OnEndHover { get; set; }
 
 		#endregion
-		
-		[SerializeField]
-		private InputReader _inputReader;
 
 		[SerializeField]
 		private float _proximityDistance = 1f;
@@ -33,6 +30,7 @@ namespace _Prototyping.Interactions.PlayerInteractions
 
 		public bool isInteracting => currentInteractable != null;
 		public bool isHovering => hoveredInteractable != null;
+		public bool isLowPriority => false;
 		
 		private float _sqrProxDistance;
 		private Collider[] _sphereCastResults;
@@ -41,11 +39,6 @@ namespace _Prototyping.Interactions.PlayerInteractions
 		{
 			_sqrProxDistance = _proximityDistance * _proximityDistance;
 			_sphereCastResults = new Collider[5];
-		}
-
-		private void Start()
-		{
-			_inputReader.onInteracted += OnInteractedButtonPressed;
 		}
 
 		private void SetHover(PlayerProximityInteractable interactable)
@@ -116,19 +109,23 @@ namespace _Prototyping.Interactions.PlayerInteractions
 			}
 		}
 		
-		private void OnInteractedButtonPressed()
+		public bool OnInteractInputPressed()
 		{
 			if (isInteracting)
 			{
 				EndInteraction(currentInteractable);
+				return true;
 			}
 			else
 			{
 				if (isHovering)
 				{
 					StartInteraction(hoveredInteractable);
+					return true;
 				}
 			}
+
+			return false;
 		}
 
 		private void ProcessHovers()
