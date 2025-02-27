@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace _Prototyping.Interactions.PlayerInteractions
 {
-	public class PlayerProximityInteractor : MonoBehaviour, IInteractor<PlayerProximityInteractable>
+	public class PlayerProximityInteractor : MonoBehaviour, IInteractor<PlayerProximityInteractable>, IPlayerInteractInputReceiver
 	{
 		#region IInteractor
 
@@ -126,6 +126,17 @@ namespace _Prototyping.Interactions.PlayerInteractions
 			}
 
 			return false;
+		}
+		
+		public bool OnInteractInputHeld(float heldDuration)
+		{
+			// TODO:
+			return false;
+		}
+
+		public void OnInteractInputReleased()
+		{
+			// TODO:
 		}
 
 		private void ProcessHovers()

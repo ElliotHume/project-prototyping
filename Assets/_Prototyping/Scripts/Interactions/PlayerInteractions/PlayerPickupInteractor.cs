@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace _Prototyping.Interactions.PlayerInteractions
 {
-	public class PlayerPickupInteractor : MonoBehaviour, IInteractor<PlayerPickupInteractable>
+	public class PlayerPickupInteractor : MonoBehaviour, IInteractor<PlayerPickupInteractable>, IPlayerInteractInputReceiver
 	{
 		#region IInteractor
 
@@ -104,7 +104,6 @@ namespace _Prototyping.Interactions.PlayerInteractions
 
 		public void EndInteraction(PlayerPickupInteractable interactable)
 		{
-			Debug.Log("End Interaction with: "+interactable.rootGameObject, interactable);
 			if (interactable == null)
 			{
 				Debug.LogError($"[{nameof(PlayerPickupInteractor)}] Tried to end an interaction with an interactable that is null");
@@ -193,6 +192,17 @@ namespace _Prototyping.Interactions.PlayerInteractions
 			}
 
 			return false;
+		}
+
+		public bool OnInteractInputHeld(float heldDuration)
+		{
+			// TODO:
+			return false;
+		}
+
+		public void OnInteractInputReleased()
+		{
+			// TODO:
 		}
 
 		private void ProcessHovers()

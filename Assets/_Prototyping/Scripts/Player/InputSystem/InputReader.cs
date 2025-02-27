@@ -20,6 +20,9 @@ namespace Synty.AnimationBaseLocomotion.Samples.InputSystem
         public float _movementInputDuration;
         public bool _movementInputDetected;
 
+        [SerializeField, Tooltip("How long should it take before a button press becomes a button hold instead")]
+        private float _buttonDownTimeoutBeforeHold = 0.2f;
+
         private Controls _controls;
 
         public Action onAimActivated;
@@ -37,7 +40,11 @@ namespace Synty.AnimationBaseLocomotion.Samples.InputSystem
 
         public Action onWalkToggled;
         
-        public Action onInteracted;
+        public Action onInteractPressed;
+        public Action<float> onInteractHeld;
+        public Action onInteractReleased;
+        private bool _isInteractionHeld;
+        private float _interactHoldTime;
 
         /// <inheritdoc cref="OnEnable" />
         private void OnEnable()
@@ -55,6 +62,17 @@ namespace Synty.AnimationBaseLocomotion.Samples.InputSystem
         public void OnDisable()
         {
             _controls.Player.Disable();
+        }
+
+        private void Update()
+        {
+            if (_isInteractionHeld)
+            {
+                _interactHoldTime += Time.deltaTime;
+                
+                if (_interactHoldTime >= _buttonDownTimeoutBeforeHold)
+                    onInteractHeld?.Invoke(_interactHoldTime);
+            }
         }
 
         /// <summary>
@@ -170,12 +188,24 @@ namespace Synty.AnimationBaseLocomotion.Samples.InputSystem
 
         public void OnInteract(InputAction.CallbackContext context)
         {
-            if (!context.performed)
+            if (context.performed)
             {
-                return;
+                _isInteractionHeld = true;
             }
 
-            onInteracted?.Invoke();
+            if (context.canceled)
+            {
+                if (_interactHoldTime < _buttonDownTimeoutBeforeHold)
+                {
+                    onInteractPressed?.Invoke();
+                }
+                else
+                {
+                    onInteractReleased?.Invoke();
+                }
+                _isInteractionHeld = false;
+                _interactHoldTime = 0f;
+            }
         }
     }
 }

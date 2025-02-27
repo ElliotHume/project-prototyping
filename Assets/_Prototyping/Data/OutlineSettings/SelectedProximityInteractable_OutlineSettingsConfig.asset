@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: SelectedProximityInteractable_OutlineSettingsConfig
   m_EditorClassIdentifier: 
   outlineMode: 0
-  outlineColor: {r: 1, g: 0.90058327, b: 0, a: 1}
-  outlineWidth: 2
+  outlineColor: {r: 1, g: 0.58961684, b: 0, a: 1}
+  outlineWidth: 4

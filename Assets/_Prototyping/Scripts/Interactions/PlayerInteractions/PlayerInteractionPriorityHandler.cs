@@ -17,15 +17,35 @@ namespace _Prototyping.Interactions.PlayerInteractions
 
 		private void Start()
 		{
-			_inputReader.onInteracted += OnInteracted;
+			_inputReader.onInteractPressed += OnInteractedPressed;
+			_inputReader.onInteractHeld += OnInteractHeld;
+			_inputReader.onInteractReleased += OnInteractReleased;
 		}
 
-		private void OnInteracted()
+		private void OnInteractedPressed()
 		{
 			foreach (SerializableUnityRef<IBaseInteractor> interactor in _interactorsInPriorityOrder.OrderBy((i) => i.value.priority))
 			{
-				if (interactor.value.OnInteractInputPressed())
+				if (interactor.value is IPlayerInteractInputReceiver playerInputInteractor && playerInputInteractor.OnInteractInputPressed())
 					return;
+			}
+		}
+		
+		private void OnInteractHeld(float heldDuration)
+		{
+			foreach (SerializableUnityRef<IBaseInteractor> interactor in _interactorsInPriorityOrder.OrderBy((i) => i.value.priority))
+			{
+				if (interactor.value is IPlayerInteractInputReceiver playerInputInteractor && playerInputInteractor.OnInteractInputHeld(heldDuration))
+					return;
+			}
+		}
+		
+		private void OnInteractReleased()
+		{
+			foreach (SerializableUnityRef<IBaseInteractor> interactor in _interactorsInPriorityOrder)
+			{
+				if (interactor.value is IPlayerInteractInputReceiver playerInputInteractor)
+					playerInputInteractor.OnInteractInputReleased();
 			}
 		}
 	}
