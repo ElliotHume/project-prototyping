@@ -34,6 +34,7 @@ MonoBehaviour:
     serializationDepthLimit: 64
     assemblyNames:
     - Assembly-CSharp
+    - AYellowpaper.SerializedCollections
     - DTT.EditorUtilities.Demo
     - DTT.ProceduralUI.Demo
     - DTT.ProceduralUI.Runtime
