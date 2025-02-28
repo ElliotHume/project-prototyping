@@ -35,6 +35,7 @@ MonoBehaviour:
     assemblyNames:
     - Assembly-CSharp
     - AYellowpaper.SerializedCollections
+    - Cinemachine
     - DTT.EditorUtilities.Demo
     - DTT.ProceduralUI.Demo
     - DTT.ProceduralUI.Runtime
