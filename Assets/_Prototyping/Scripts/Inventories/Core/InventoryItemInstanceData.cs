@@ -8,5 +8,7 @@ namespace _Prototyping.Inventories.Core
 	{
 		public Guid uuid { get; set; }
 		public Dictionary<string, string> instanceDataDict;
+		
+		
 	}
 }
