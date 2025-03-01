@@ -23,6 +23,48 @@ namespace _Prototyping.Chess.Movement
 		public int range = 8;
 
 		public abstract MovementType movementType { get; }
-		public abstract List<Vector2Int> GetPossibleMovePositions(Vector2Int currentPosition);
+		
+		public abstract Vector2Int GetNextPosition(Vector2Int originLocation, int distance);
+		
+		public virtual List<Vector2Int> GetPossibleMovePositions(ChessPiece piece, ChessBoard board)
+		{
+			Vector2Int position;
+			List<Vector2Int> positions = new List<Vector2Int>();
+			for (int i = 0; i < range; i++)
+			{
+				position = GetNextPosition(piece.gridCoordinates, i);
+
+				(bool isPossiblePosition, bool canContinuePast) resultsCheck = CheckOffBoardAndPieceTake(position, piece, board);
+				
+				if (resultsCheck.isPossiblePosition)
+					positions.Add(position);
+
+				if (!resultsCheck.canContinuePast)
+					break;
+			}
+
+			return positions;
+		}
+		
+		protected virtual (bool, bool) CheckOffBoardAndPieceTake(Vector2Int position, ChessPiece piece, ChessBoard board)
+		{
+			bool isPossiblePosition = true;
+			bool canContinuePast = true;
+			// If the position if off of the board
+			if (!board.IsPositionOnBoard(position))
+			{
+				isPossiblePosition = false;
+				canContinuePast = false;
+			}
+				
+			if (!board.cells[position].isEmpty)
+			{
+				canContinuePast = false;
+				if (!board.CanPieceTakeOther(piece, board.cells[position].chessPiece))
+					isPossiblePosition = false;
+			}
+
+			return (isPossiblePosition, canContinuePast);
+		}
 	}
 }

@@ -1,3 +1,4 @@
+using _Prototyping.Chess;
 using _Prototyping.PointerSelectables.Core;
 using _Prototyping.Utilities;
 using UnityEngine;
@@ -5,8 +6,11 @@ using UnityEngine.Events;
 
 namespace _Prototyping.PointerSelectables
 {
-	public class BoardPieceSelectable : MonoBehaviour, IPointerSelectable
+	public class ChessPieceSelectable : MonoBehaviour, IPointerSelectable
 	{
+		[field: SerializeField]
+		public ChessPiece chessPiece { get; private set; }
+		
 		[SerializeField] private Outline _outline;
 		[SerializeField] private OutlineSettingsConfig _hoveredOutlineSettingsConfig;
 		[SerializeField] private OutlineSettingsConfig _selectedOutlineSettingsConfig;
@@ -55,6 +59,12 @@ namespace _Prototyping.PointerSelectables
 		}
 		
 		#endregion
+
+		private void Start()
+		{
+			if (chessPiece == null)
+				chessPiece = GetComponentInParent<ChessPiece>();
+		}
 		
 		public void ApplyOutline()
 		{

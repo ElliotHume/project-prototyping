@@ -68,5 +68,30 @@ namespace _Prototyping.Chess
 
 			return true;
 		}
+
+		public List<ChessBoardCell> ConvertCoordinateListToBoardCells(List<Vector2Int> coordinateList)
+		{
+			List<ChessBoardCell> cellsList = new List<ChessBoardCell>();
+			foreach (Vector2Int coordinate in coordinateList)
+			{
+				cellsList.Add(cells[coordinate]);
+			}
+			return cellsList;
+		}
+
+		public bool CanPieceTakeOther(ChessPiece selectedPiece, ChessPiece targetPiece)
+		{
+			// Check if the pieces are on the same team
+			if ((selectedPiece.isPlayerControlled && targetPiece.isPlayerControlled)
+				|| (!selectedPiece.isPlayerControlled && !targetPiece.isPlayerControlled))
+				return false;
+
+			List<Vector2Int> possibleCoordinateOptions = selectedPiece.GetPossibleMovementOptionCoordinates();
+			if (possibleCoordinateOptions.Contains(targetPiece.gridCoordinates))
+			{
+			}
+
+			return true;
+		}
 	}
 }

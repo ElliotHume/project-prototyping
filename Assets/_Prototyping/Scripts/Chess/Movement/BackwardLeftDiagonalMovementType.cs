@@ -7,16 +7,7 @@ namespace _Prototyping.Chess.Movement
 	public class BackwardLeftDiagonalMovementType : ChessMovementType
 	{
 		public override MovementType movementType => MovementType.BackwardLeftDiagonal;
-
-		public override List<Vector2Int> GetPossibleMovePositions(Vector2Int currentPosition)
-		{
-			List<Vector2Int> positions = new List<Vector2Int>();
-			for (int i = 0; i < range; i++)
-			{
-				positions.Add(new Vector2Int(currentPosition.x+i, currentPosition.y-i));
-			}
-
-			return positions;
-		}
+		
+		public override Vector2Int GetNextPosition(Vector2Int originLocation, int distance) => new Vector2Int(originLocation.x-distance, originLocation.y-distance);
 	}
 }

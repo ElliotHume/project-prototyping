@@ -2,12 +2,10 @@ using System;
 using _Prototyping.PointerSelectables.Core;
 using UnityEngine;
 
-namespace _Prototyping.Camera
+namespace _Prototyping.PointerSelectables
 {
 	public class SelectablePointerHandler : MonoBehaviour
 	{
-		public static SelectablePointerHandler Instance;
-		
 		[SerializeField]
 		private UnityEngine.Camera _mainCamera;
 
@@ -23,28 +21,28 @@ namespace _Prototyping.Camera
 		public Action<IPointerSelectable> OnPointerSelectionEnded;
 		public IPointerSelectable previousSelectedSelectable { get; private set; }
 
-		private void Awake()
-		{
-			SelectablePointerHandler.Instance = this;
-		}
-		
 		private void Update()
 		{
-			Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
-			CheckHovers(ray);
-			CheckSelection();
+			IPointerSelectable hitSelectable = GetRaycastHitSelectable();
+			CheckHovers(hitSelectable);
+			CheckSelection(hitSelectable);
 		}
 
-		private void CheckHovers(Ray mousePositionRay)
+		private IPointerSelectable GetRaycastHitSelectable()
 		{
+			Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
 			IPointerSelectable hitSelectable = null;
-			if (Physics.Raycast(mousePositionRay, out RaycastHit hit, 100, _selectableLayerMask, QueryTriggerInteraction.Collide))
+			if (Physics.Raycast(ray, out RaycastHit hit, 100, _selectableLayerMask, QueryTriggerInteraction.Collide))
 			{
 				IPointerSelectable selectable = hit.collider.gameObject.GetComponentInParent<IPointerSelectable>();
-				if (selectable != null && selectable.canBeSelected)
+				if (selectable != null && selectable.canBeHovered)
 					hitSelectable = selectable;
 			}
+			return hitSelectable;
+		}
 
+		private void CheckHovers(IPointerSelectable hitSelectable)
+		{
 			if (hitSelectable != hoveredSelectable)
 			{
 				if (hoveredSelectable != null)
@@ -52,20 +50,18 @@ namespace _Prototyping.Camera
 					hoveredSelectable.EndHover();
 					OnPointerHoverEnded?.Invoke(hitSelectable);
 				}
-					
-
+				
 				if (hitSelectable != null)
 				{
 					hitSelectable.StartHover();
 					OnPointerHoverStarted?.Invoke(hitSelectable);
 				}
-					
 
 				hoveredSelectable = hitSelectable;
 			}
 		}
 		
-		private void CheckSelection()
+		private void CheckSelection(IPointerSelectable hitSelectable)
 		{
 			if (Input.GetMouseButtonDown(0))
 			{
@@ -78,9 +74,9 @@ namespace _Prototyping.Camera
 				previousSelectedSelectable = selectedSelectable;
 				selectedSelectable = null;
 				
-				if (hoveredSelectable != null)
+				if (hitSelectable != null && hitSelectable.canBeSelected)
 				{
-					selectedSelectable = hoveredSelectable;
+					selectedSelectable = hitSelectable;
 					selectedSelectable.StartSelection();
 					OnPointerSelectionStarted?.Invoke(selectedSelectable);
 				}

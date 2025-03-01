@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using _Prototyping.Chess.Movement;
-using _Prototyping.Grids;
 
 namespace _Prototyping.Chess.Core
 {
