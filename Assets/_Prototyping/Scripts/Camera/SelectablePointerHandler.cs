@@ -1,3 +1,4 @@
+using System;
 using _Prototyping.PointerSelectables.Core;
 using UnityEngine;
 
@@ -5,14 +6,27 @@ namespace _Prototyping.Camera
 {
 	public class SelectablePointerHandler : MonoBehaviour
 	{
+		public static SelectablePointerHandler Instance;
+		
 		[SerializeField]
 		private UnityEngine.Camera _mainCamera;
 
 		[SerializeField]
 		private LayerMask _selectableLayerMask;
 
-		private IPointerSelectable _hoveredSelectable;
-		private IPointerSelectable _selectedSelectable;
+		public IPointerSelectable hoveredSelectable { get; private set; }
+		public Action<IPointerSelectable> OnPointerHoverStarted;
+		public Action<IPointerSelectable> OnPointerHoverEnded;
+		
+		public IPointerSelectable selectedSelectable { get; private set; }
+		public Action<IPointerSelectable> OnPointerSelectionStarted;
+		public Action<IPointerSelectable> OnPointerSelectionEnded;
+		public IPointerSelectable previousSelectedSelectable { get; private set; }
+
+		private void Awake()
+		{
+			SelectablePointerHandler.Instance = this;
+		}
 		
 		private void Update()
 		{
@@ -31,15 +45,23 @@ namespace _Prototyping.Camera
 					hitSelectable = selectable;
 			}
 
-			if (hitSelectable != _hoveredSelectable)
+			if (hitSelectable != hoveredSelectable)
 			{
-				if (_hoveredSelectable != null)
-					_hoveredSelectable.EndHover();
-				
-				if (hitSelectable != null)
-					hitSelectable.StartHover();
+				if (hoveredSelectable != null)
+				{
+					hoveredSelectable.EndHover();
+					OnPointerHoverEnded?.Invoke(hitSelectable);
+				}
+					
 
-				_hoveredSelectable = hitSelectable;
+				if (hitSelectable != null)
+				{
+					hitSelectable.StartHover();
+					OnPointerHoverStarted?.Invoke(hitSelectable);
+				}
+					
+
+				hoveredSelectable = hitSelectable;
 			}
 		}
 		
@@ -47,13 +69,20 @@ namespace _Prototyping.Camera
 		{
 			if (Input.GetMouseButtonDown(0))
 			{
-				if (_selectedSelectable != null)
-					_selectedSelectable.EndSelection();
-				
-				if (_hoveredSelectable != null)
+				if (selectedSelectable != null)
 				{
-					_selectedSelectable = _hoveredSelectable;
-					_selectedSelectable.StartSelection();
+					selectedSelectable.EndSelection();
+					OnPointerSelectionEnded?.Invoke(selectedSelectable);
+				}
+
+				previousSelectedSelectable = selectedSelectable;
+				selectedSelectable = null;
+				
+				if (hoveredSelectable != null)
+				{
+					selectedSelectable = hoveredSelectable;
+					selectedSelectable.StartSelection();
+					OnPointerSelectionStarted?.Invoke(selectedSelectable);
 				}
 			}
 		}

@@ -1,7 +1,9 @@
+using System;
 using _Prototyping.Grids.Core;
 using _Prototyping.PointerSelectables.Core;
 using _Prototyping.Utilities;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace _Prototyping.Grids
 {
@@ -18,33 +20,49 @@ namespace _Prototyping.Grids
 		public int x => gridCoordinates.x;
 		public int y => gridCoordinates.y;
 		
+		#region ISelectable
+		
 		public bool canBeSelected { get; private set; } = true;
 		public bool isHovered { get; private set; }
 		public bool isSelected { get; private set; }
-		
+		[field: SerializeField]
+		public UnityEvent OnHoverStart { get; set; }
+		[field: SerializeField]
+		public UnityEvent OnHoverEnd { get; set; }
+		[field: SerializeField]
+		public UnityEvent OnSelectionStart { get; set; }
+		[field: SerializeField]
+		public UnityEvent OnSelectionEnd { get; set; }
+
 		public void StartHover()
 		{
 			isHovered = true;
+			OnHoverStart?.Invoke();
 			ApplyOutline();
 		}
 
 		public void EndHover()
 		{
 			isHovered = false;
+			OnHoverEnd?.Invoke();
 			ApplyOutline();
 		}
 
 		public void StartSelection()
 		{
 			isSelected = true;
+			OnSelectionStart?.Invoke();
 			ApplyOutline();
 		}
 
 		public void EndSelection()
 		{
 			isSelected = false;
+			OnSelectionEnd?.Invoke();
 			ApplyOutline();
 		}
+		
+		#endregion
 
 		public void ApplyOutline()
 		{
