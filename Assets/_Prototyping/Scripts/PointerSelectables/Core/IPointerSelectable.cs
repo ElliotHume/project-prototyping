@@ -1,11 +1,10 @@
-using System;
-using UnityEngine;
 using UnityEngine.Events;
 
 namespace _Prototyping.PointerSelectables.Core
 {
 	public interface IPointerSelectable
 	{
+		public bool canBeHovered { get; }
 		public bool canBeSelected { get; }
 		public bool isHovered { get; }
 		public bool isSelected { get; }

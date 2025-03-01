@@ -1,41 +1,34 @@
 using System.Collections.Generic;
-using _Prototyping.Grids.Core;
 using UnityEngine;
 
-namespace _Prototyping.Grids
+namespace _Prototyping.Chess
 {
-	public class GridBoardCell : MonoBehaviour, IGridCell<GridBoardCell>
+	public class ChessTileVisuals : MonoBehaviour
 	{
-		public bool doesChangeMaterialWithPosition = true;
-
 		[SerializeField] private List<Renderer> _renderersToChangeMaterial;
 		[SerializeField] private Material _baseMaterial;
 		[SerializeField] private Material _alternateMaterial;
 		[SerializeField] private Outline _outline;
-
-		public IGrid<GridBoardCell> grid { get; private set; }
-		public Vector2Int gridCoordinates { get; private set; }
-		public int x => gridCoordinates.x;
-		public int y => gridCoordinates.y;
-
+		
+		public bool doesChangeMaterialWithPosition = true;
+		
 		private bool _isHighlighted = false;
+		private ChessBoardCell _cell;
 
-		public void Instantiate(GridBoard grid, Vector2Int coordinates)
+		public void UpdateVisuals(ChessBoardCell cell)
 		{
-			this.grid = grid;
-			this.gridCoordinates = coordinates;
-
+			_cell = cell;
 			ToggleHighlight(_isHighlighted);
 
 			if (doesChangeMaterialWithPosition)
 				ChangeColourWithPosition();
 		}
-
+		
 		private void ChangeColourWithPosition()
 		{
 			foreach (Renderer renderer in _renderersToChangeMaterial)
 			{
-				if ((x % 2 == 0 && y % 2 != 0) || (x % 2 != 0 && y % 2 == 0))
+				if ((_cell.x % 2 == 0 && _cell.y % 2 != 0) || (_cell.x % 2 != 0 && _cell.y % 2 == 0))
 				{
 					renderer.material = _alternateMaterial;
 				}

@@ -1,27 +1,19 @@
-using System;
-using _Prototyping.Grids.Core;
 using _Prototyping.PointerSelectables.Core;
 using _Prototyping.Utilities;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace _Prototyping.Grids
+namespace _Prototyping.PointerSelectables
 {
-	public class GridCellObject : MonoBehaviour, IHasGridPosition<GridBoardCell>, IPointerSelectable
+	public class BoardPieceSelectable : MonoBehaviour, IPointerSelectable
 	{
 		[SerializeField] private Outline _outline;
 		[SerializeField] private OutlineSettingsConfig _hoveredOutlineSettingsConfig;
 		[SerializeField] private OutlineSettingsConfig _selectedOutlineSettingsConfig;
-		public GridBoardCell cell { get; private set; }
-		public IGridCell<GridBoardCell> Cell => cell;
-
-		public IGrid<GridBoardCell> grid => cell.grid;
-		public Vector2Int gridCoordinates => cell.gridCoordinates;
-		public int x => gridCoordinates.x;
-		public int y => gridCoordinates.y;
 		
 		#region ISelectable
 		
+		public bool canBeHovered { get; private set; } = true;
 		public bool canBeSelected { get; private set; } = true;
 		public bool isHovered { get; private set; }
 		public bool isSelected { get; private set; }
@@ -63,7 +55,7 @@ namespace _Prototyping.Grids
 		}
 		
 		#endregion
-
+		
 		public void ApplyOutline()
 		{
 			bool showOutline = isSelected || isHovered;

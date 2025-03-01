@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using _Prototyping.Grids.Core;
 using UnityEngine;
 
-namespace _Prototyping.Grids
+namespace _Prototyping.Chess
 {
-	public class GridBoard : MonoBehaviour, IGrid<GridBoardCell>
+	public class ChessBoard : MonoBehaviour, IGrid<ChessBoardCell>
 	{
 		[field: SerializeField]
 		public Vector2Int dimensions { get; private set; }
@@ -13,12 +13,12 @@ namespace _Prototyping.Grids
 		public int height => dimensions.y;
 
 		[SerializeField]
-		private GridBoardCell _cellPrefab;
+		private ChessBoardCell _cellPrefab;
 
 		[SerializeField]
 		private float _spaceBetweenCells = 1f;
 
-		public Dictionary<Vector2Int, GridBoardCell> cells { get; private set; }
+		public Dictionary<Vector2Int, ChessBoardCell> cells { get; private set; }
 
 		private void Start()
 		{
@@ -29,10 +29,10 @@ namespace _Prototyping.Grids
 		{
 			// Destroy previous cells, if they exist
 			if (cells != null && cells.Count > 0)
-				foreach (GridBoardCell cell in cells.Values)
+				foreach (ChessBoardCell cell in cells.Values)
 					Destroy(cell);
 			
-			cells = new Dictionary<Vector2Int, GridBoardCell>();
+			cells = new Dictionary<Vector2Int, ChessBoardCell>();
 			
 			Vector3 startPosition = transform.position;
 			Quaternion rotation = transform.rotation;
@@ -41,13 +41,32 @@ namespace _Prototyping.Grids
 				for (int j = 0; j < height; j++)
 				{
 					Vector2Int coordinates = new Vector2Int(i, j);
-					GridBoardCell spawnedCell = Instantiate(_cellPrefab,
+					ChessBoardCell spawnedCell = Instantiate(_cellPrefab,
 						startPosition + new Vector3(_spaceBetweenCells * i, 0, _spaceBetweenCells * j), rotation,
 						transform);
 					spawnedCell.Instantiate(this, coordinates);
 					cells.Add(coordinates, spawnedCell);
 				}
 			}
+		}
+
+		public bool IsPositionOnBoard(Vector2Int position)
+		{
+			if (position.x < 0 || position.x >= width || position.y < 0 || position.y >= height)
+				return false;
+			
+			return true;
+		}
+
+		public bool IsPositionAvailable(Vector2Int position)
+		{
+			if (!IsPositionOnBoard(position))
+				return false;
+
+			if (!cells[position].isEmpty)
+				return false;
+
+			return true;
 		}
 	}
 }
