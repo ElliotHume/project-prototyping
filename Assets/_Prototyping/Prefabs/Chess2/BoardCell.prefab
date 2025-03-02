@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6133574215994617862}
   - component: {fileID: 4916826652874753934}
+  - component: {fileID: 2620006181506288764}
+  - component: {fileID: 1087661838935407316}
   - component: {fileID: -1132278000961513603}
   m_Layer: 8
   m_Name: BoardCell
@@ -46,13 +48,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a961432662d4b22876ea938a1a0fae0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  doesChangeMaterialWithPosition: 1
-  _renderersToChangeMaterial:
-  - {fileID: 1204432932226556716}
-  _baseMaterial: {fileID: 2100000, guid: eaea0e5d5ead82c48b11624f76cd0cf9, type: 2}
-  _alternateMaterial: {fileID: 2100000, guid: 270d9ced1b282e04685342461f188a4a, type: 2}
-  _outline: {fileID: -1132278000961513603}
---- !u!114 &-1132278000961513603
+  <piecePositionTransform>k__BackingField: {fileID: 6133574215994617862}
+  OnPieceMovedToCell:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &2620006181506288764
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -61,11 +61,53 @@ MonoBehaviour:
   m_GameObject: {fileID: 6696985955568497648}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2350ccd212ad4315bc1088e9bd95626d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <OnHoverStart>k__BackingField:
+    m_PersistentCalls:
+      m_Calls: []
+  <OnHoverEnd>k__BackingField:
+    m_PersistentCalls:
+      m_Calls: []
+  <OnSelectionStart>k__BackingField:
+    m_PersistentCalls:
+      m_Calls: []
+  <OnSelectionEnd>k__BackingField:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1087661838935407316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6696985955568497648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 764f140365704c8187e0b4aa8f20aedf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _renderersToChangeMaterial:
+  - {fileID: 1204432932226556716}
+  _baseMaterial: {fileID: 2100000, guid: eaea0e5d5ead82c48b11624f76cd0cf9, type: 2}
+  _alternateMaterial: {fileID: 2100000, guid: 270d9ced1b282e04685342461f188a4a, type: 2}
+  _outline: {fileID: -1132278000961513603}
+  doesChangeMaterialWithPosition: 1
+--- !u!114 &-1132278000961513603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6696985955568497648}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   outlineMode: 3
-  outlineColor: {r: 0, g: 1, b: 0.96201396, a: 1}
+  outlineColor: {r: 0, g: 1, b: 0.025922537, a: 1}
   outlineWidth: 6
   precomputeOutline: 1
   bakeKeys:

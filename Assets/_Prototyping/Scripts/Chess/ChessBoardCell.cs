@@ -16,7 +16,7 @@ namespace _Prototyping.Chess
 		public int y => gridCoordinates.y;
 
 		public ChessPiece chessPiece { get; private set; }
-		public bool isEmpty => chessPiece != null;
+		public bool isEmpty => chessPiece == null;
 
 		public UnityEvent<ChessPiece> OnPieceMovedToCell;
 		

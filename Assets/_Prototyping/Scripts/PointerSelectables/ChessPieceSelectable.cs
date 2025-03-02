@@ -46,15 +46,32 @@ namespace _Prototyping.PointerSelectables
 
 		public void StartSelection()
 		{
-			isSelected = true;
-			OnSelectionStart?.Invoke();
-			ApplyOutline();
+			// Handled by chess manager selection
+			// isSelected = true;
+			// OnSelectionStart?.Invoke();
+			// ApplyOutline();
 		}
 
 		public void EndSelection()
 		{
-			isSelected = false;
-			OnSelectionEnd?.Invoke();
+			// isSelected = false;
+			// OnSelectionEnd?.Invoke();
+			// ApplyOutline();
+		}
+
+		public void ToggleSelection(bool toggleSelected)
+		{
+			isSelected = toggleSelected;
+			
+			if (toggleSelected)
+			{
+				OnSelectionStart?.Invoke();
+			}
+			else
+			{
+				OnSelectionEnd?.Invoke();
+			}
+			
 			ApplyOutline();
 		}
 		

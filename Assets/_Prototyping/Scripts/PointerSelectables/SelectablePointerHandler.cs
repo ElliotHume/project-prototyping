@@ -1,6 +1,7 @@
 using System;
 using _Prototyping.PointerSelectables.Core;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace _Prototyping.PointerSelectables
 {
@@ -26,6 +27,8 @@ namespace _Prototyping.PointerSelectables
 			IPointerSelectable hitSelectable = GetRaycastHitSelectable();
 			CheckHovers(hitSelectable);
 			CheckSelection(hitSelectable);
+
+			DEBUGCheckRestartScene();
 		}
 
 		private IPointerSelectable GetRaycastHitSelectable()
@@ -80,6 +83,16 @@ namespace _Prototyping.PointerSelectables
 					selectedSelectable.StartSelection();
 					OnPointerSelectionStarted?.Invoke(selectedSelectable);
 				}
+			}
+		}
+
+
+		private void DEBUGCheckRestartScene()
+		{
+			if (Input.GetKeyDown(KeyCode.Tab))
+			{
+				string currentSceneName = SceneManager.GetActiveScene().name;
+				SceneManager.LoadScene(currentSceneName);
 			}
 		}
 	}

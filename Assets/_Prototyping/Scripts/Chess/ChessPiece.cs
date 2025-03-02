@@ -3,6 +3,7 @@ using _Prototyping.Chess.Core;
 using _Prototyping.Chess.Movement;
 using _Prototyping.Grids.Core;
 using _Prototyping.PointerSelectables;
+using _Prototyping.Utilities;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -28,7 +29,6 @@ namespace _Prototyping.Chess
 		public ChessPieceType type => _config.type;
 		public List<ChessMovementType> movementOptions { get; set; }
 		
-		public ChessBoardCell cell { get; private set; }
 		public IGridCell<ChessBoardCell> Cell => cell;
 
 		public IGrid<ChessBoardCell> grid => cell.grid;
@@ -37,6 +37,10 @@ namespace _Prototyping.Chess
 		public int y => gridCoordinates.y;
 
 		public UnityEvent<ChessBoardCell> OnChangedCells;
+		
+		[field: Header("DEBUG")]
+		[field: SerializeField]
+		public ChessBoardCell cell { get; private set; }
 		
 		private void Start()
 		{
@@ -53,9 +57,9 @@ namespace _Prototyping.Chess
 			cell.SetPiece(this);
 			
 			// Position transform of piece onto the tile
-			transform.position = cell.piecePositionTransform.position - _tileSnapPointTransform.localPosition;
-			transform.rotation = cell.piecePositionTransform.rotation * _tileSnapPointTransform.localRotation;
-
+			transform.position = cell.piecePositionTransform.position;
+			transform.rotation = cell.piecePositionTransform.rotation;
+			
 			OnChangedCells?.Invoke(newCell);
 		}
 
@@ -74,7 +78,8 @@ namespace _Prototyping.Chess
 
 		public void Kill()
 		{
-			Instantiate(_deathVFXPrefab, transform.position, transform.rotation);
+			if (_deathVFXPrefab != null)
+				Instantiate(_deathVFXPrefab, transform.position, transform.rotation);
 			ChessManager.Instance.UnregisterChessPiece(this);
 			Destroy(this);
 		}

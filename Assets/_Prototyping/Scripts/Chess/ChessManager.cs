@@ -22,9 +22,15 @@ namespace _Prototyping.Chess
 
 		[field: SerializeField]
 		public ChessBoard chessBoard { get; private set; }
+		
+		[field: SerializeField]
+		public ChessBoardMovementHighlighter chessBoardMovementHighlighter { get; private set; }
 
 		[SerializeField]
 		private SelectablePointerHandler _selectablePointerHandler;
+
+		[SerializeField]
+		private ChessBoardSetupConfig _gameStartBoardSetup;
 
 		public List<ChessPiece> chessPieces { get; private set; }
 		public List<ChessPiece> playerChessPieces => chessPieces.Where((piece) => piece.isPlayerControlled).ToList();
@@ -45,12 +51,25 @@ namespace _Prototyping.Chess
 
 		public UnityEvent<ChessPiece> OnPlayerPieceTakenUnityEvent;
 		public UnityEvent<ChessPiece> OnEnemyPieceTakenUnityEvent;
-		
-		public ChessPiece selectedChessPiece { get; private set; }
+
+		private ChessPiece _selectedChessPiece;
+
+		public ChessPiece selectedChessPiece
+		{
+			get => _selectedChessPiece;
+			private set
+			{
+				_selectedChessPiece = value;
+				OnSelectedPieceChanged?.Invoke(value);
+			}
+		}
+
+		public Action<ChessPiece> OnSelectedPieceChanged;
 		
 		private void Awake()
 		{
 			Instance = this;
+			chessPieces = new List<ChessPiece>();
 		}
 
 		private void Start()
@@ -58,6 +77,22 @@ namespace _Prototyping.Chess
 			gameState = ChessGameState.PlayerTurn;
 			
 			_selectablePointerHandler.OnPointerSelectionStarted += OnPointerSelectionStarted;
+			OnSelectedPieceChanged += OnSelectedPieceChangedMethod;
+
+			if (chessBoard.isInitialized)
+			{
+				SetupGameStartBoard();
+			}
+			else
+			{
+				chessBoard.OnInitialized += SetupGameStartBoard;
+			}
+		}
+
+		private void OnDestroy()
+		{
+			_selectablePointerHandler.OnPointerSelectionStarted -= OnPointerSelectionStarted;
+			chessBoard.OnInitialized -= SetupGameStartBoard;
 		}
 
 		public void RegisterChessPiece(ChessPiece chessPiece)
@@ -67,7 +102,6 @@ namespace _Prototyping.Chess
 				chessPieces.Add(chessPiece);
 				OnRegisteredChessPiece?.Invoke(chessPiece);
 			}
-				
 		}
 		
 		public void UnregisterChessPiece(ChessPiece chessPiece)
@@ -79,34 +113,73 @@ namespace _Prototyping.Chess
 			}
 		}
 
+		private void SetupGameStartBoard()
+		{
+			Debug.Log($"[{nameof(ChessManager)}] Starting Initial Board Setup...");
+			foreach (KeyValuePair<Vector2Int, ChessPiece> kvpChessPiece in _gameStartBoardSetup.chessPieceMap)
+			{
+				ChessPiece newPiece = Instantiate(kvpChessPiece.Value, Vector3.up * 1000, Quaternion.identity);
+				newPiece.MoveToCell(chessBoard.cells[kvpChessPiece.Key]);
+			}
+			
+			Debug.Log($"[{nameof(ChessManager)}] Finished Initial Board Setup");
+		}
+
 		private void OnPointerSelectionStarted(IPointerSelectable selectable)
 		{
-			// Player's cannot act when it is not their turn.
-			if (gameState != ChessGameState.PlayerTurn)
+			if (!canPlayerAct)
 				return;
 			
 			if (selectable is ChessPieceSelectable chessPieceSelectable)
 			{
-				if (selectedChessPiece != null && selectedChessPiece.chessPieceSelectable != chessPieceSelectable)
+				if (chessPieceSelectable.chessPiece.isPlayerControlled)
 				{
 					// TODO: Castling logic
 					
 					// If the selected new piece is player controlled, switch control to that piece
-					if (chessPieceSelectable.chessPiece.isPlayerControlled)
+					if (selectedChessPiece != null)
+						selectedChessPiece.chessPieceSelectable.ToggleSelection(false);
+					selectedChessPiece = chessPieceSelectable.chessPiece;
+					return;
+				}
+				
+				if (selectedChessPiece != null && selectedChessPiece.chessPieceSelectable != chessPieceSelectable)
+				{
+					if (chessBoard.CanPieceTakeOther(selectedChessPiece, chessPieceSelectable.chessPiece))
 					{
-						selectedChessPiece = chessPieceSelectable.chessPiece;
+						PlayerMovePieceToCell(selectedChessPiece, chessPieceSelectable.chessPiece.cell);
 						return;
 					}
 				}
 			}
+			else
+			{
+				if (selectedChessPiece != null)
+					selectedChessPiece.chessPieceSelectable.ToggleSelection(false);
+				selectedChessPiece = null;
+			}
+		}
+
+		private void OnSelectedPieceChangedMethod(ChessPiece piece)
+		{
+			if (chessBoardMovementHighlighter != null)
+				chessBoardMovementHighlighter.HighlightMovementForPiece(piece);
+			
+			if (piece != null)
+				piece.chessPieceSelectable.ToggleSelection(true);
 		}
 
 		private void PlayerMovePieceToCell(ChessPiece piece, ChessBoardCell cell)
 		{
-			if (!cell.isEmpty)
+			ChangeToResolvePlayerTurn();
+			if (!cell.isEmpty && !cell.chessPiece.isPlayerControlled)
 			{
-						
+				OnEnemyPieceTakenUnityEvent?.Invoke(cell.chessPiece);
+				cell.chessPiece.Kill();
 			}
+
+			piece.MoveToCell(cell);
+			ChangeToEnemyTurn();
 		}
 
 		private void ChangeToPlayerTurn()
@@ -125,6 +198,7 @@ namespace _Prototyping.Chess
 			if (gameState != ChessGameState.PlayerTurn)
 				return;
 
+			selectedChessPiece = null;
 			gameState = ChessGameState.ResolvingPlayerTurn;
 			OnResolvePlayerTurnUnityEvent?.Invoke();
 		}

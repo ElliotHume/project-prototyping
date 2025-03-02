@@ -18,6 +18,8 @@ namespace _Prototyping.Chess.Movement
 			BackwardLeftDiagonal = 8,
 			LShape = 9,
 			Castle = 10,
+			
+			ForwardDiagonalAttack
 		}
 
 		public int range = 8;
@@ -30,7 +32,7 @@ namespace _Prototyping.Chess.Movement
 		{
 			Vector2Int position;
 			List<Vector2Int> positions = new List<Vector2Int>();
-			for (int i = 0; i < range; i++)
+			for (int i = 1; i <= range; i++)
 			{
 				position = GetNextPosition(piece.gridCoordinates, i);
 
@@ -50,18 +52,33 @@ namespace _Prototyping.Chess.Movement
 		{
 			bool isPossiblePosition = true;
 			bool canContinuePast = true;
-			// If the position if off of the board
+			// If the position is off of the board, early return
 			if (!board.IsPositionOnBoard(position))
-			{
-				isPossiblePosition = false;
-				canContinuePast = false;
-			}
-				
+				return (false, false);
+
 			if (!board.cells[position].isEmpty)
 			{
 				canContinuePast = false;
 				if (!board.CanPieceTakeOther(piece, board.cells[position].chessPiece))
 					isPossiblePosition = false;
+			}
+
+			return (isPossiblePosition, canContinuePast);
+		}
+		
+		/// <summary>
+		/// Checks for valid positions ONLY where pieces can be taken on the board, cannot be used to move to empty spaces
+		/// </summary>
+		protected virtual (bool, bool) CheckOffBoardAndPieceTakeAttack(Vector2Int position, ChessPiece piece, ChessBoard board)
+		{
+			bool isPossiblePosition = false;
+			bool canContinuePast = board.IsPositionOnBoard(position);
+
+			if (canContinuePast && !board.cells[position].isEmpty)
+			{
+				canContinuePast = false;
+				if (board.CanPieceTakeOther(piece, board.cells[position].chessPiece))
+					isPossiblePosition = true;
 			}
 
 			return (isPossiblePosition, canContinuePast);

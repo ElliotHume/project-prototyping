@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using _Prototyping.Grids.Core;
 using UnityEngine;
@@ -19,6 +20,9 @@ namespace _Prototyping.Chess
 		private float _spaceBetweenCells = 1f;
 
 		public Dictionary<Vector2Int, ChessBoardCell> cells { get; private set; }
+
+		public bool isInitialized { get; private set; }
+		public Action OnInitialized;
 
 		private void Start()
 		{
@@ -48,6 +52,11 @@ namespace _Prototyping.Chess
 					cells.Add(coordinates, spawnedCell);
 				}
 			}
+			
+			Debug.Log($"[{nameof(ChessBoard)}] Initialized Board");
+
+			isInitialized = true;
+			OnInitialized?.Invoke();
 		}
 
 		public bool IsPositionOnBoard(Vector2Int position)
@@ -86,10 +95,10 @@ namespace _Prototyping.Chess
 				|| (!selectedPiece.isPlayerControlled && !targetPiece.isPlayerControlled))
 				return false;
 
+			// If the coordinates of the target piece are not a possible move, it cannot be taken
 			List<Vector2Int> possibleCoordinateOptions = selectedPiece.GetPossibleMovementOptionCoordinates();
-			if (possibleCoordinateOptions.Contains(targetPiece.gridCoordinates))
-			{
-			}
+			if (!possibleCoordinateOptions.Contains(targetPiece.gridCoordinates))
+				return false;
 
 			return true;
 		}
