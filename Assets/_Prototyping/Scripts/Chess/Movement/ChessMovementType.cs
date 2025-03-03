@@ -8,21 +8,20 @@ namespace _Prototyping.Chess.Movement
 		public enum MovementType
 		{
 			None = 0,
-			Forward = 1,
-			Backward = 2,
+			Up = 1,
+			Down = 2,
 			Right = 3,
 			Left = 4,
-			ForwardRightDiagonal = 5,
-			ForwardLeftDiagonal = 6,
-			BackwardRightDiagonal = 7,
-			BackwardLeftDiagonal = 8,
+			UpRightDiagonal = 5,
+			UpLeftDiagonal = 6,
+			DownRightDiagonal = 7,
+			DownLeftDiagonal = 8,
 			LShape = 9,
 			Castle = 10,
-			
-			ForwardDiagonalAttack
 		}
 
 		public int range = 8;
+		public bool attackingOnly;
 
 		public abstract MovementType movementType { get; }
 		
@@ -36,7 +35,10 @@ namespace _Prototyping.Chess.Movement
 			{
 				position = GetNextPosition(piece.gridCoordinates, i);
 
-				(bool isPossiblePosition, bool canContinuePast) resultsCheck = CheckOffBoardAndPieceTake(position, piece, board);
+				(bool isPossiblePosition, bool canContinuePast) resultsCheck =
+					attackingOnly
+						? CheckOffBoardAndPieceTakeAttack(position, piece, board)
+						: CheckOffBoardAndPieceTake(position, piece, board);
 				
 				if (resultsCheck.isPossiblePosition)
 					positions.Add(position);
@@ -59,7 +61,7 @@ namespace _Prototyping.Chess.Movement
 			if (!board.cells[position].isEmpty)
 			{
 				canContinuePast = false;
-				if (!board.CanPieceTakeOther(piece, board.cells[position].chessPiece))
+				if (!board.ArePiecesOnDifferentTeams(piece, board.cells[position].chessPiece))
 					isPossiblePosition = false;
 			}
 
@@ -77,7 +79,7 @@ namespace _Prototyping.Chess.Movement
 			if (canContinuePast && !board.cells[position].isEmpty)
 			{
 				canContinuePast = false;
-				if (board.CanPieceTakeOther(piece, board.cells[position].chessPiece))
+				if (board.ArePiecesOnDifferentTeams(piece, board.cells[position].chessPiece))
 					isPossiblePosition = true;
 			}
 

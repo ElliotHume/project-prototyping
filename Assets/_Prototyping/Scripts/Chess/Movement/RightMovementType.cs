@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace _Prototyping.Chess.Movement
 {
-	[CreateAssetMenu(menuName = "PROTO/Chess/Movement/" + nameof(RightMovementType), fileName = nameof(RightMovementType)+"_Default")]
+	[CreateAssetMenu(menuName = "PROTO/Chess/Movement/" + nameof(RightMovementType), fileName = nameof(RightMovementType))]
 	public class RightMovementType : ChessMovementType
 	{
 		public override MovementType movementType => MovementType.Right;

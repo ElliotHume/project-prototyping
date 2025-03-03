@@ -3,7 +3,6 @@ using _Prototyping.Chess.Core;
 using _Prototyping.Chess.Movement;
 using _Prototyping.Grids.Core;
 using _Prototyping.PointerSelectables;
-using _Prototyping.Utilities;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -27,6 +26,9 @@ namespace _Prototyping.Chess
 		private GameObject _deathVFXPrefab;
 		
 		public ChessPieceType type => _config.type;
+		
+		public int dynamicInfluence { get; private set; }
+		public int influence => _config.baseInfluence + dynamicInfluence;
 		public List<ChessMovementType> movementOptions { get; set; }
 		
 		public IGridCell<ChessBoardCell> Cell => cell;
@@ -37,6 +39,17 @@ namespace _Prototyping.Chess
 		public int y => gridCoordinates.y;
 
 		public UnityEvent<ChessBoardCell> OnChangedCells;
+
+		private ChessManager _chessManager;
+		public ChessManager chessManager
+		{
+			get
+			{
+				if (_chessManager == null)
+					_chessManager = ChessManager.Instance;
+				return _chessManager;
+			}
+		}
 		
 		[field: Header("DEBUG")]
 		[field: SerializeField]
@@ -81,7 +94,7 @@ namespace _Prototyping.Chess
 			if (_deathVFXPrefab != null)
 				Instantiate(_deathVFXPrefab, transform.position, transform.rotation);
 			ChessManager.Instance.UnregisterChessPiece(this);
-			Destroy(this);
+			Destroy(gameObject);
 		}
 	}
 }

@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8f662de93b494c27bacca6560fb6bd9d, type: 3}
-  m_Name: ChessPieceConfig_Pawn
+  m_Name: ChessPieceConfig_PlayerPawn
   m_EditorClassIdentifier: 
   type: 0
   movementOptions:
   - {fileID: 11400000, guid: d92d76b3f309df649b96b87d02788fc6, type: 2}
-  - {fileID: 11400000, guid: 3afae12441d01714bbd41f3ea7e6a8ea, type: 2}
+  - {fileID: 11400000, guid: 553e0e278c12e1747bcb4a4d6eee6942, type: 2}
+  - {fileID: 11400000, guid: 2373ce732e681484ca74de66bd2dafc9, type: 2}

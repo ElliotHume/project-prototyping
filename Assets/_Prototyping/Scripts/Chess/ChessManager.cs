@@ -5,6 +5,7 @@ using _Prototyping.PointerSelectables;
 using _Prototyping.PointerSelectables.Core;
 using UnityEngine;
 using UnityEngine.Events;
+using Random = UnityEngine.Random;
 
 namespace _Prototyping.Chess
 {
@@ -53,6 +54,8 @@ namespace _Prototyping.Chess
 		public UnityEvent<ChessPiece> OnEnemyPieceTakenUnityEvent;
 
 		private ChessPiece _selectedChessPiece;
+		private IPointerSelectable _cachedSelectable;
+		private IPointerSelectable _cachedPreviousSelectable;
 
 		public ChessPiece selectedChessPiece
 		{
@@ -76,7 +79,6 @@ namespace _Prototyping.Chess
 		{
 			gameState = ChessGameState.PlayerTurn;
 			
-			_selectablePointerHandler.OnPointerSelectionStarted += OnPointerSelectionStarted;
 			OnSelectedPieceChanged += OnSelectedPieceChangedMethod;
 
 			if (chessBoard.isInitialized)
@@ -89,9 +91,26 @@ namespace _Prototyping.Chess
 			}
 		}
 
+		private void FixedUpdate()
+		{
+			switch (gameState)
+			{
+				case ChessGameState.Paused:
+					break;
+				case ChessGameState.PlayerTurn:
+					ProcessPlayerTurn();
+					break;
+				case ChessGameState.ResolvingPlayerTurn:
+					break;
+				case ChessGameState.EnemyTurn:
+					break;
+				case ChessGameState.ResolvingEnemyTurn:
+					break;
+			}
+		}
+
 		private void OnDestroy()
 		{
-			_selectablePointerHandler.OnPointerSelectionStarted -= OnPointerSelectionStarted;
 			chessBoard.OnInitialized -= SetupGameStartBoard;
 		}
 
@@ -125,48 +144,75 @@ namespace _Prototyping.Chess
 			Debug.Log($"[{nameof(ChessManager)}] Finished Initial Board Setup");
 		}
 
-		private void OnPointerSelectionStarted(IPointerSelectable selectable)
+		private void ProcessPlayerTurn()
 		{
 			if (!canPlayerAct)
 				return;
 			
+			// Get selected player piece
+			IPointerSelectable selectable = _selectablePointerHandler.selectedSelectable;
+			IPointerSelectable previousSelectable = _selectablePointerHandler.previousSelectedSelectable;
+
+			// If nothing selectable has changed, do not proceed past this point.
+			if (selectable == _cachedSelectable && previousSelectable == _cachedPreviousSelectable)
+				return;
+
+			if (selectable == null)
+			{
+				selectedChessPiece = null;
+				return;
+			}
+			
+			if (selectable == previousSelectable)
+				return;
+
 			if (selectable is ChessPieceSelectable chessPieceSelectable)
 			{
+				// If the selectable piece is player controlled, switch the selected piece to it
 				if (chessPieceSelectable.chessPiece.isPlayerControlled)
 				{
 					// TODO: Castling logic
 					
 					// If the selected new piece is player controlled, switch control to that piece
-					if (selectedChessPiece != null)
-						selectedChessPiece.chessPieceSelectable.ToggleSelection(false);
 					selectedChessPiece = chessPieceSelectable.chessPiece;
 					return;
 				}
 				
-				if (selectedChessPiece != null && selectedChessPiece.chessPieceSelectable != chessPieceSelectable)
+				// If the selectable is not player controlled, check if we previously had selected a player piece
+				if (previousSelectable is ChessPieceSelectable previousChessPieceSelectable)
 				{
-					if (chessBoard.CanPieceTakeOther(selectedChessPiece, chessPieceSelectable.chessPiece))
+					if (previousChessPieceSelectable.chessPiece.isPlayerControlled)
 					{
-						PlayerMovePieceToCell(selectedChessPiece, chessPieceSelectable.chessPiece.cell);
-						return;
+						if (chessBoard.CanPieceTakeOther(previousChessPieceSelectable.chessPiece, chessPieceSelectable.chessPiece))
+						{
+							PlayerMovePieceToCell(previousChessPieceSelectable.chessPiece, chessPieceSelectable.chessPiece.cell);
+							return;
+						}
+					}
+				}
+			} else if (selectable is ChessBoardCellSelectable chessBoardCellSelectable)
+			{
+				if (previousSelectable is ChessPieceSelectable previousChessPieceSelectable)
+				{
+					if (previousChessPieceSelectable.chessPiece.isPlayerControlled)
+					{
+						if (chessBoard.CanPieceMoveToCell(previousChessPieceSelectable.chessPiece, chessBoardCellSelectable.cell))
+						{
+							PlayerMovePieceToCell(previousChessPieceSelectable.chessPiece, chessBoardCellSelectable.cell);
+							return;
+						}
 					}
 				}
 			}
-			else
-			{
-				if (selectedChessPiece != null)
-					selectedChessPiece.chessPieceSelectable.ToggleSelection(false);
-				selectedChessPiece = null;
-			}
-		}
 
+			_cachedSelectable = selectable;
+			_cachedPreviousSelectable = previousSelectable;
+		}
+		
 		private void OnSelectedPieceChangedMethod(ChessPiece piece)
 		{
 			if (chessBoardMovementHighlighter != null)
 				chessBoardMovementHighlighter.HighlightMovementForPiece(piece);
-			
-			if (piece != null)
-				piece.chessPieceSelectable.ToggleSelection(true);
 		}
 
 		private void PlayerMovePieceToCell(ChessPiece piece, ChessBoardCell cell)
@@ -174,7 +220,7 @@ namespace _Prototyping.Chess
 			ChangeToResolvePlayerTurn();
 			if (!cell.isEmpty && !cell.chessPiece.isPlayerControlled)
 			{
-				OnEnemyPieceTakenUnityEvent?.Invoke(cell.chessPiece);
+				OnPlayerPieceTakenUnityEvent?.Invoke(cell.chessPiece);
 				cell.chessPiece.Kill();
 			}
 
@@ -211,6 +257,51 @@ namespace _Prototyping.Chess
 
 			gameState = ChessGameState.EnemyTurn;
 			OnStartEnemyTurnUnityEvent?.Invoke();
+		}
+
+		private void ProcessEnemyTurn()
+		{
+			Dictionary<ChessPiece, List<ChessPiece>>
+				enemyPossibleMoves = new Dictionary<ChessPiece, List<ChessPiece>>();
+			foreach (ChessPiece enemyPiece in enemyChessPieces)
+			{
+				List<ChessPiece> takeablePieces = chessBoard.GetListOfTakeablePieces(enemyPiece);
+				if (takeablePieces.Count > 0)
+					enemyPossibleMoves.TryAdd(enemyPiece, takeablePieces);
+			}
+			
+			// TODO: iterate through to find the enemy piece with the lowest influence that can take the piece with the highest influence
+			// TODO: if not take is possible, move a random piece, with a higher weight given to low influence pieces
+		}
+
+		private ChessPiece FindHighestInfluencePiece(List<ChessPiece> pieces)
+		{
+			int highestInfluence = pieces[0].influence;
+			ChessPiece highestInfluencePiece = pieces[0];
+			for (int i = 1; i < pieces.Count; i++)
+			{
+				if (pieces[i].influence > highestInfluence
+					|| (pieces[i].influence == highestInfluence && Random.value >= 0.5f))
+				{
+					highestInfluence = pieces[i].influence;
+					highestInfluencePiece = pieces[i];
+				}
+			}
+
+			return highestInfluencePiece;
+		}
+		
+		private void EnemyMovePieceToCell(ChessPiece piece, ChessBoardCell cell)
+		{
+			ChangeToResolveEnemyTurn();
+			if (!cell.isEmpty && cell.chessPiece.isPlayerControlled)
+			{
+				OnEnemyPieceTakenUnityEvent?.Invoke(cell.chessPiece);
+				cell.chessPiece.Kill();
+			}
+
+			piece.MoveToCell(cell);
+			ChangeToPlayerTurn();
 		}
 		
 		private void ChangeToResolveEnemyTurn()

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using _Prototyping.Grids.Core;
 using UnityEngine;
 
@@ -23,6 +24,17 @@ namespace _Prototyping.Chess
 
 		public bool isInitialized { get; private set; }
 		public Action OnInitialized;
+		
+		private ChessManager _chessManager;
+		public ChessManager chessManager
+		{
+			get
+			{
+				if (_chessManager == null)
+					_chessManager = ChessManager.Instance;
+				return _chessManager;
+			}
+		}
 
 		private void Start()
 		{
@@ -87,20 +99,35 @@ namespace _Prototyping.Chess
 			}
 			return cellsList;
 		}
+		
+		public bool ArePiecesOnDifferentTeams(ChessPiece firstPiece, ChessPiece secondPiece)
+		{
+			return firstPiece.isPlayerControlled != secondPiece.isPlayerControlled;
+		}
+
+		public bool CanPieceMoveToCell(ChessPiece selectedPiece, ChessBoardCell targetCell)
+		{
+			Debug.Log($"[{nameof(ChessBoard)}] Check can piece [{selectedPiece}] move to cell [{targetCell.gridCoordinates}]");
+			List<Vector2Int> possibleCoordinateOptions = selectedPiece.GetPossibleMovementOptionCoordinates();
+			bool movePossible = possibleCoordinateOptions.Contains(targetCell.gridCoordinates);
+			
+			// TODO: Check for castling
+			bool noBlockingPiece = targetCell.isEmpty
+									|| (!targetCell.chessPiece.isPlayerControlled && ArePiecesOnDifferentTeams(selectedPiece, targetCell.chessPiece));
+			
+			return movePossible && noBlockingPiece;
+		}
 
 		public bool CanPieceTakeOther(ChessPiece selectedPiece, ChessPiece targetPiece)
 		{
-			// Check if the pieces are on the same team
-			if ((selectedPiece.isPlayerControlled && targetPiece.isPlayerControlled)
-				|| (!selectedPiece.isPlayerControlled && !targetPiece.isPlayerControlled))
-				return false;
+			return CanPieceMoveToCell(selectedPiece, targetPiece.cell);
+		}
 
-			// If the coordinates of the target piece are not a possible move, it cannot be taken
-			List<Vector2Int> possibleCoordinateOptions = selectedPiece.GetPossibleMovementOptionCoordinates();
-			if (!possibleCoordinateOptions.Contains(targetPiece.gridCoordinates))
-				return false;
-
-			return true;
+		public List<ChessPiece> GetListOfTakeablePieces(ChessPiece selectedPiece)
+		{
+			List<Vector2Int> possibleCoordinateOptions = selectedPiece.GetPossibleMovementOptionCoordinates()
+				.Where((coord) => !cells[coord].isEmpty && ArePiecesOnDifferentTeams(selectedPiece, cells[coord].chessPiece)).ToList();
+			return possibleCoordinateOptions.Select((coord) => cells[coord].chessPiece).ToList();
 		}
 	}
 }

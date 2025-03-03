@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2323793030120027025}
   - component: {fileID: 210997234965470670}
   m_Layer: 0
-  m_Name: Pawn
+  m_Name: EnemyPawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,15 +47,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01f8a139ed877914dbfaa7ea17718b80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _config: {fileID: 11400000, guid: b8a7a2afbe0955d4daeb98f2f48ced26, type: 2}
-  <isPlayerControlled>k__BackingField: 1
+  _config: {fileID: 11400000, guid: 68061609f50909f4d8f3a1e98aca376c, type: 2}
+  <isPlayerControlled>k__BackingField: 0
   <chessPieceSelectable>k__BackingField: {fileID: 2323793030120027025}
   _tileSnapPointTransform: {fileID: 3245589939533675431}
   _deathVFXPrefab: {fileID: 0}
-  <cell>k__BackingField: {fileID: 0}
   OnChangedCells:
     m_PersistentCalls:
       m_Calls: []
+  <cell>k__BackingField: {fileID: 0}
 --- !u!114 &2323793030120027025
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -684,7 +684,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 4da944dee22e4da48bc19c1b822f2980, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace _Prototyping.Chess.Movement
 {
-	[CreateAssetMenu(menuName = "PROTO/Chess/Movement/" + nameof(LShapeMovementType), fileName = nameof(LShapeMovementType)+"_Default")]
+	[CreateAssetMenu(menuName = "PROTO/Chess/Movement/" + nameof(LShapeMovementType), fileName = nameof(LShapeMovementType))]
 	public class LShapeMovementType : ChessMovementType
 	{
 		public override MovementType movementType => MovementType.LShape;

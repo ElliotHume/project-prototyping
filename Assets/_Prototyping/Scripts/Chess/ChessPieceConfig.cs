@@ -9,6 +9,7 @@ namespace _Prototyping.Chess
 	public class ChessPieceConfig : ScriptableObject
 	{
 		public ChessPieceType type;
+		public int baseInfluence = 0;
 		public List<ChessMovementType> movementOptions;
 	}
 }

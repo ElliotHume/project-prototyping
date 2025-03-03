@@ -18,7 +18,7 @@ namespace _Prototyping.PointerSelectables
 		#region ISelectable
 		
 		public bool canBeHovered { get; private set; } = true;
-		public bool canBeSelected { get; private set; } = true;
+		public bool canBeSelected => (!chessPiece.chessManager || chessPiece.chessManager.canPlayerAct);
 		public bool isHovered { get; private set; }
 		public bool isSelected { get; private set; }
 		[field: SerializeField]
@@ -46,35 +46,18 @@ namespace _Prototyping.PointerSelectables
 
 		public void StartSelection()
 		{
-			// Handled by chess manager selection
-			// isSelected = true;
-			// OnSelectionStart?.Invoke();
-			// ApplyOutline();
+			isSelected = true;
+			OnSelectionStart?.Invoke();
+			ApplyOutline();
 		}
 
 		public void EndSelection()
 		{
-			// isSelected = false;
-			// OnSelectionEnd?.Invoke();
-			// ApplyOutline();
-		}
-
-		public void ToggleSelection(bool toggleSelected)
-		{
-			isSelected = toggleSelected;
-			
-			if (toggleSelected)
-			{
-				OnSelectionStart?.Invoke();
-			}
-			else
-			{
-				OnSelectionEnd?.Invoke();
-			}
-			
+			isSelected = false;
+			OnSelectionEnd?.Invoke();
 			ApplyOutline();
 		}
-		
+
 		#endregion
 
 		private void Start()
@@ -85,6 +68,9 @@ namespace _Prototyping.PointerSelectables
 		
 		public void ApplyOutline()
 		{
+			if (_outline == null)
+				return;
+			
 			bool showOutline = isSelected || isHovered;
 			_outline.enabled = showOutline;
 
