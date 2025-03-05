@@ -9,7 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1fa293bca7a14acfa9dadd0bf5bdf6c2, type: 3}
-  m_Name: UpMovementType_Range1
+  m_Script: {fileID: 11500000, guid: b09e295146184ffebe1ef81c9b295ab5, type: 3}
+  m_Name: DownMovementType_MovementOnly_Range1
   m_EditorClassIdentifier: 
   range: 1
+  attackType: 2

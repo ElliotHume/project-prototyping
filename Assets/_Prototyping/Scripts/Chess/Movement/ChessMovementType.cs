@@ -5,8 +5,7 @@ namespace _Prototyping.Chess.Movement
 {
 	public abstract class ChessMovementType : ScriptableObject
 	{
-		public enum MovementType
-		{
+		public enum MovementType {
 			None = 0,
 			Up = 1,
 			Down = 2,
@@ -20,8 +19,15 @@ namespace _Prototyping.Chess.Movement
 			Castle = 10,
 		}
 
+		public enum AttackType
+		{
+			Default,
+			AttackOnly,
+			MovementOnly,
+		}
+
 		public int range = 8;
-		public bool attackingOnly;
+		public AttackType attackType;
 
 		public abstract MovementType movementType { get; }
 		
@@ -36,9 +42,11 @@ namespace _Prototyping.Chess.Movement
 				position = GetNextPosition(piece.gridCoordinates, i);
 
 				(bool isPossiblePosition, bool canContinuePast) resultsCheck =
-					attackingOnly
+					attackType == AttackType.AttackOnly
 						? CheckOffBoardAndPieceTakeAttack(position, piece, board)
-						: CheckOffBoardAndPieceTake(position, piece, board);
+						: attackType == AttackType.MovementOnly
+								? CheckOffBoardNoAttack(position, piece, board)
+								: CheckOffBoardAndPieceTake(position, piece, board);
 				
 				if (resultsCheck.isPossiblePosition)
 					positions.Add(position);
@@ -81,6 +89,24 @@ namespace _Prototyping.Chess.Movement
 				canContinuePast = false;
 				if (board.ArePiecesOnDifferentTeams(piece, board.cells[position].chessPiece))
 					isPossiblePosition = true;
+			}
+
+			return (isPossiblePosition, canContinuePast);
+		}
+		
+		protected virtual (bool, bool) CheckOffBoardNoAttack(Vector2Int position, ChessPiece piece, ChessBoard board)
+		{
+			bool isPossiblePosition = true;
+			bool canContinuePast = true;
+			// If the position is off of the board, early return
+			if (!board.IsPositionOnBoard(position))
+				return (false, false);
+
+			if (!board.cells[position].isEmpty)
+			{
+				canContinuePast = false;
+				// TODO: Castling
+				isPossiblePosition = false;
 			}
 
 			return (isPossiblePosition, canContinuePast);

@@ -219,7 +219,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9596ea932f84e4fa067b7fb34fdb761, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <dimensions>k__BackingField: {x: 8, y: 8}
+  <initialDimensions>k__BackingField: {x: 8, y: 8}
   _cellPrefab: {fileID: 4916826652874753934, guid: d1b93f384dcce794bbf767794c7cafdc, type: 3}
   _spaceBetweenCells: 1
 --- !u!4 &739087194

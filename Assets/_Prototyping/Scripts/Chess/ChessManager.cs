@@ -103,6 +103,7 @@ namespace _Prototyping.Chess
 				case ChessGameState.ResolvingPlayerTurn:
 					break;
 				case ChessGameState.EnemyTurn:
+					ProcessEnemyTurn();
 					break;
 				case ChessGameState.ResolvingEnemyTurn:
 					break;
@@ -225,6 +226,7 @@ namespace _Prototyping.Chess
 			}
 
 			piece.MoveToCell(cell);
+			chessBoard.PrintBoardState();
 			ChangeToEnemyTurn();
 		}
 
@@ -261,21 +263,51 @@ namespace _Prototyping.Chess
 
 		private void ProcessEnemyTurn()
 		{
-			Dictionary<ChessPiece, List<ChessPiece>>
-				enemyPossibleMoves = new Dictionary<ChessPiece, List<ChessPiece>>();
-			foreach (ChessPiece enemyPiece in enemyChessPieces)
+			(ChessPiece selectedPiece, ChessPiece targetPiece, int influenceDifference) bestPieceTake = GetBestPossiblePieceTake(enemyChessPieces);
+			if (bestPieceTake.selectedPiece != null && bestPieceTake.targetPiece != null)
 			{
-				List<ChessPiece> takeablePieces = chessBoard.GetListOfTakeablePieces(enemyPiece);
-				if (takeablePieces.Count > 0)
-					enemyPossibleMoves.TryAdd(enemyPiece, takeablePieces);
+				Debug.Log("Found attack move!");
+				EnemyMovePieceToCell(bestPieceTake.selectedPiece, bestPieceTake.targetPiece.cell);
+				return;
 			}
 			
-			// TODO: iterate through to find the enemy piece with the lowest influence that can take the piece with the highest influence
-			// TODO: if not take is possible, move a random piece, with a higher weight given to low influence pieces
+			// TODO: Add support to find best possible setup move, before defaulting to a random move
+			
+			(ChessPiece selectedPiece, ChessBoardCell targetCell) randomMove = GetRandomMove(enemyChessPieces);
+			Debug.Log("Moving random piece");
+			EnemyMovePieceToCell(randomMove.selectedPiece, randomMove.targetCell);
+			
 		}
+
+		private (ChessPiece selectedPiece, ChessPiece targetPiece, int influenceDifference) GetBestPossiblePieceTake(List<ChessPiece> piecesToCheck)
+		{
+			int bestInfluenceDiff = -999;
+			ChessPiece chosenPieceToMove = null;
+			ChessPiece targetPieceToTake = null;
+			foreach (ChessPiece piece in piecesToCheck)
+			{
+				Debug.Log("Checking piece: "+piece);
+				ChessPiece highestInfluenceTakeablePiece = FindHighestInfluencePiece(chessBoard.GetListOfTakeablePieces(piece));
+				if (highestInfluenceTakeablePiece != null)
+				{
+					int influenceDiff = highestInfluenceTakeablePiece.influence - piece.influence;
+					if (influenceDiff > bestInfluenceDiff)
+					{
+						bestInfluenceDiff = influenceDiff;
+						chosenPieceToMove = piece;
+						targetPieceToTake = highestInfluenceTakeablePiece;
+					}
+				}
+			}
+
+			return (chosenPieceToMove, targetPieceToTake, bestInfluenceDiff);
+		} 
 
 		private ChessPiece FindHighestInfluencePiece(List<ChessPiece> pieces)
 		{
+			if (pieces.Count == 0)
+				return null;
+
 			int highestInfluence = pieces[0].influence;
 			ChessPiece highestInfluencePiece = pieces[0];
 			for (int i = 1; i < pieces.Count; i++)
@@ -290,17 +322,49 @@ namespace _Prototyping.Chess
 
 			return highestInfluencePiece;
 		}
+
+		/// <summary>
+		/// Finds the best movement for a set of pieces that will set up a turn with a good piece-take
+		/// </summary>
+		private (ChessPiece selectedPiece, ChessBoardCell targetCell) GetBestPossibleSetupMove(
+			List<ChessPiece> piecesToCheck)
+		{
+			ChessPiece chosenPieceToMove = null;
+			ChessBoardCell targetCell = null;
+
+
+			return (chosenPieceToMove, targetCell);
+		}
+
+		private (ChessPiece selectedPiece, ChessBoardCell targetCell) GetRandomMove(List<ChessPiece> piecesToCheck)
+		{
+			if (piecesToCheck.Count == 0)
+				return (null, null);
+			
+			int randomIndex = Random.Range(0, piecesToCheck.Count);
+			
+			ChessPiece selectedPiece = piecesToCheck[randomIndex];
+			List<Vector2Int> possibleMovementOptions = selectedPiece.GetPossibleMovementOptionCoordinates();
+			
+			randomIndex = Random.Range(0, possibleMovementOptions.Count);
+			ChessBoardCell targetCell = chessBoard.cells[possibleMovementOptions[randomIndex]];
+
+			return (selectedPiece, targetCell);
+		}
+		
 		
 		private void EnemyMovePieceToCell(ChessPiece piece, ChessBoardCell cell)
 		{
 			ChangeToResolveEnemyTurn();
+			Debug.Log($"[{nameof(ChessManager)}] Move piece {piece} to cell {cell.gridCoordinates}");
 			if (!cell.isEmpty && cell.chessPiece.isPlayerControlled)
 			{
 				OnEnemyPieceTakenUnityEvent?.Invoke(cell.chessPiece);
+				Debug.Log($"[{nameof(ChessManager)}] Kill piece {cell.chessPiece}");
 				cell.chessPiece.Kill();
 			}
-
 			piece.MoveToCell(cell);
+			chessBoard.PrintBoardState();
 			ChangeToPlayerTurn();
 		}
 		

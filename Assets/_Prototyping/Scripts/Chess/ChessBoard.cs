@@ -9,10 +9,7 @@ namespace _Prototyping.Chess
 	public class ChessBoard : MonoBehaviour, IGrid<ChessBoardCell>
 	{
 		[field: SerializeField]
-		public Vector2Int dimensions { get; private set; }
-
-		public int width => dimensions.x;
-		public int height => dimensions.y;
+		public Vector2Int initialDimensions { get; private set; }
 
 		[SerializeField]
 		private ChessBoardCell _cellPrefab;
@@ -52,15 +49,16 @@ namespace _Prototyping.Chess
 			
 			Vector3 startPosition = transform.position;
 			Quaternion rotation = transform.rotation;
-			for (int i = 0; i < width; i++)
+			for (int i = 0; i < initialDimensions.x; i++)
 			{
-				for (int j = 0; j < height; j++)
+				for (int j = 0; j < initialDimensions.y; j++)
 				{
 					Vector2Int coordinates = new Vector2Int(i, j);
 					ChessBoardCell spawnedCell = Instantiate(_cellPrefab,
 						startPosition + new Vector3(_spaceBetweenCells * i, 0, _spaceBetweenCells * j), rotation,
 						transform);
 					spawnedCell.Instantiate(this, coordinates);
+					Debug.Log("SPAWNED CELL");
 					cells.Add(coordinates, spawnedCell);
 				}
 			}
@@ -73,10 +71,7 @@ namespace _Prototyping.Chess
 
 		public bool IsPositionOnBoard(Vector2Int position)
 		{
-			if (position.x < 0 || position.x >= width || position.y < 0 || position.y >= height)
-				return false;
-			
-			return true;
+			return cells.ContainsKey(position);
 		}
 
 		public bool IsPositionAvailable(Vector2Int position)
@@ -128,6 +123,17 @@ namespace _Prototyping.Chess
 			List<Vector2Int> possibleCoordinateOptions = selectedPiece.GetPossibleMovementOptionCoordinates()
 				.Where((coord) => !cells[coord].isEmpty && ArePiecesOnDifferentTeams(selectedPiece, cells[coord].chessPiece)).ToList();
 			return possibleCoordinateOptions.Select((coord) => cells[coord].chessPiece).ToList();
+		}
+
+		public void PrintBoardState()
+		{
+			string stateString = "-------------------Board State------------------------";
+			foreach (KeyValuePair<Vector2Int, ChessBoardCell> kvp in cells)
+			{
+				stateString += $"\n[{kvp.Key}] - piece: {(kvp.Value.isEmpty ? "Empty" : kvp.Value.chessPiece)}";
+			}
+
+			Debug.Log(stateString);
 		}
 	}
 }

@@ -66,6 +66,9 @@ namespace _Prototyping.Chess
 
 		public void MoveToCell(ChessBoardCell newCell)
 		{
+			if (cell != null)
+				cell.SetPiece(null);
+			
 			cell = newCell;
 			cell.SetPiece(this);
 			
