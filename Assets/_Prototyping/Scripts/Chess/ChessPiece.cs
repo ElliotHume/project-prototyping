@@ -39,7 +39,7 @@ namespace _Prototyping.Chess
 		public int x => gridCoordinates.x;
 		public int y => gridCoordinates.y;
 
-		public UnityEvent<ChessBoardCell> OnChangedCells;
+		public UnityEvent<ChessBoardCell> OnChangedCellsUnityEvent;
 
 		public Action<ChessPiece> OnThisPieceTaken;
 		public Action<ChessPiece> OnPieceTakeOther;
@@ -80,7 +80,7 @@ namespace _Prototyping.Chess
 			transform.position = cell.piecePositionTransform.position;
 			transform.rotation = cell.piecePositionTransform.rotation;
 			
-			OnChangedCells?.Invoke(newCell);
+			OnChangedCellsUnityEvent?.Invoke(newCell);
 		}
 
 		public List<Vector2Int> GetPossibleMovementOptionCoordinates()

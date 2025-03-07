@@ -8,8 +8,9 @@ namespace _Prototyping.ActionTriggers.ChessActions
 		public ChessManager chessManager;
 		public ChessBoard chessBoard;
 		public ChessPiece piece;
+		public ChessBoardCell cell;
 		
-		public ChessPiece triggeringPiece;
-		public List<ChessPiece> affectedPieces;
+		public List<ChessPiece> paramPieces;
+		public List<ChessBoardCell> paramCells;
 	}
 }

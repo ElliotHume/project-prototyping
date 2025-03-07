@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace _Prototyping.ActionTriggers.ChessActions.Triggers
 {
-	public class OnThisPieceTakenTrigger : ScriptableObject, IChessActionTrigger
+	public class OnPieceMovedTrigger : ScriptableObject, IChessActionTrigger
 	{
 		public List<ITriggerableAction<ChessActionData>> triggerables { get; private set; }
 		public Action<ChessActionData> OnTriggered { get; set; }
@@ -26,7 +26,7 @@ namespace _Prototyping.ActionTriggers.ChessActions.Triggers
 			_chessBoard = chessBoard;
 			_chessPiece = chessPiece;
 
-			_chessPiece.OnThisPieceTaken += TriggerActions;
+			_chessPiece.OnChangedCellsUnityEvent.AddListener(TriggerActions);
 			isInitialized = true;
 		}
 		
@@ -48,7 +48,7 @@ namespace _Prototyping.ActionTriggers.ChessActions.Triggers
 			}
 		}
 
-		private void TriggerActions(ChessPiece pieceTakingThisOne)
+		private void TriggerActions(ChessBoardCell movedToCell)
 		{
 			TriggerActions( new ChessActionData()
 			{
@@ -56,7 +56,7 @@ namespace _Prototyping.ActionTriggers.ChessActions.Triggers
 				chessBoard = _chessBoard,
 				piece = _chessPiece,
 				
-				paramPieces = new List<ChessPiece>(){pieceTakingThisOne},
+				paramCells = new List<ChessBoardCell>(){movedToCell},
 			});
 		}
 
@@ -70,7 +70,7 @@ namespace _Prototyping.ActionTriggers.ChessActions.Triggers
 			if (!isInitialized)
 				return;
 			
-			_chessPiece.OnThisPieceTaken -= TriggerActions;
+			_chessPiece.OnChangedCellsUnityEvent.RemoveListener(TriggerActions);
 			
 			foreach (ITriggerableAction<ChessActionData> triggerableAction in triggerables)
 				RemoveAction(triggerableAction);

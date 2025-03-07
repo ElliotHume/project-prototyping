@@ -33,6 +33,9 @@ namespace _Prototyping.Chess.Scheduler
 		public void UpdateTasks(ChessManager.ChessGameState currentGameState)
 		{
 			Queue<IChessScheduledTask> queue = _turnQueues[currentGameState];
+			if (queue.Count == 0)
+				return;
+			
 			IChessScheduledTask task = queue.Peek();
 			switch (task.taskState)
 			{

@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: DownMovementType_MovementOnly_Range1
   m_EditorClassIdentifier: 
   range: 1
-  attackType: 2
+  movementAttackType: 2
