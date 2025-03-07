@@ -19,7 +19,7 @@ namespace _Prototyping.Chess.Movement
 			Castle = 10,
 		}
 
-		public enum AttackType
+		public enum MovementAttackType
 		{
 			Default,
 			AttackOnly,
@@ -27,7 +27,7 @@ namespace _Prototyping.Chess.Movement
 		}
 
 		public int range = 8;
-		public AttackType attackType;
+		public MovementAttackType movementAttackType;
 
 		public abstract MovementType movementType { get; }
 		
@@ -42,9 +42,9 @@ namespace _Prototyping.Chess.Movement
 				position = GetNextPosition(piece.gridCoordinates, i);
 
 				(bool isPossiblePosition, bool canContinuePast) resultsCheck =
-					attackType == AttackType.AttackOnly
+					movementAttackType == MovementAttackType.AttackOnly
 						? CheckOffBoardAndPieceTakeAttack(position, piece, board)
-						: attackType == AttackType.MovementOnly
+						: movementAttackType == MovementAttackType.MovementOnly
 								? CheckOffBoardNoAttack(position, piece, board)
 								: CheckOffBoardAndPieceTake(position, piece, board);
 				

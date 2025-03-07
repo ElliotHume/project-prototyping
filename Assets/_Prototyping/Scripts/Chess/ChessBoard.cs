@@ -125,6 +125,17 @@ namespace _Prototyping.Chess
 			return possibleCoordinateOptions.Select((coord) => cells[coord].chessPiece).ToList();
 		}
 
+		// TODO: replace boolean with an enum for what kind of attack it was (piece take, AoE attack, etc...)
+		public void KillPieceOnCell(ChessBoardCell targetCell, bool isPieceTake = true)
+		{
+			if (!targetCell.isEmpty)
+			{
+				Debug.Log($"[{nameof(ChessManager)}] Kill piece {targetCell.chessPiece}");
+				targetCell.chessPiece.Kill(targetCell.chessPiece);	
+			}
+		}
+		
+
 		public void PrintBoardState()
 		{
 			string stateString = "-------------------Board State------------------------";

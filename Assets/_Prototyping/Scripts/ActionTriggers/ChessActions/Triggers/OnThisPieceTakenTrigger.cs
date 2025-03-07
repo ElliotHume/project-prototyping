@@ -5,7 +5,7 @@ using _Prototyping.ActionTriggers.Core;
 using _Prototyping.Chess;
 using UnityEngine;
 
-namespace _Prototyping.ActionTriggers.ChessActions
+namespace _Prototyping.ActionTriggers.ChessActions.Triggers
 {
 	public class OnThisPieceTakenTrigger : ScriptableObject, IChessActionTrigger
 	{
@@ -54,7 +54,7 @@ namespace _Prototyping.ActionTriggers.ChessActions
 			{
 				chessManager = _chessManager,
 				chessBoard = _chessBoard,
-				triggeredPiece = _chessPiece,
+				piece = _chessPiece,
 				
 				triggeringPiece = pieceTakingThisOne,
 			});

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using _Prototyping.Chess.Scheduler;
+using _Prototyping.Chess.Scheduler.Tasks;
 using _Prototyping.PointerSelectables;
 using _Prototyping.PointerSelectables.Core;
 using UnityEngine;
@@ -41,8 +43,9 @@ namespace _Prototyping.Chess
 		
 		public ChessGameState gameState;
 		private ChessGameState _cachedGameState;
-		public bool canPlayerAct => gameState == ChessGameState.PlayerTurn;
-		public bool canEnemyAct => gameState == ChessGameState.EnemyTurn;
+		private ChessScheduler _scheduler;
+		public bool canPlayerAct => gameState == ChessGameState.PlayerTurn && _scheduler.CheckCanMoveToNextGameState(gameState);
+		public bool canEnemyAct => gameState == ChessGameState.EnemyTurn && _scheduler.CheckCanMoveToNextGameState(gameState);
 
 		public UnityEvent onPauseGameUnityEvent;
 		public UnityEvent OnStartPlayerTurnUnityEvent;
@@ -90,26 +93,7 @@ namespace _Prototyping.Chess
 				chessBoard.OnInitialized += SetupGameStartBoard;
 			}
 		}
-
-		private void FixedUpdate()
-		{
-			switch (gameState)
-			{
-				case ChessGameState.Paused:
-					break;
-				case ChessGameState.PlayerTurn:
-					ProcessPlayerTurn();
-					break;
-				case ChessGameState.ResolvingPlayerTurn:
-					break;
-				case ChessGameState.EnemyTurn:
-					ProcessEnemyTurn();
-					break;
-				case ChessGameState.ResolvingEnemyTurn:
-					break;
-			}
-		}
-
+		
 		private void OnDestroy()
 		{
 			chessBoard.OnInitialized -= SetupGameStartBoard;
@@ -143,6 +127,57 @@ namespace _Prototyping.Chess
 			}
 			
 			Debug.Log($"[{nameof(ChessManager)}] Finished Initial Board Setup");
+		}
+
+		private void FixedUpdate()
+		{
+			if (_scheduler == null)
+				_scheduler = ChessScheduler.Instance;
+
+			switch (gameState)
+			{
+				case ChessGameState.Paused:
+					break;
+				case ChessGameState.PlayerTurn:
+					ProcessPlayerTurn();
+					break;
+				case ChessGameState.ResolvingPlayerTurn:
+					ProcessResolvePlayerTurn();
+					break;
+				case ChessGameState.EnemyTurn:
+					ProcessEnemyTurn();
+					break;
+				case ChessGameState.ResolvingEnemyTurn:
+					ProcessResolveEnemyTurn();
+					break;
+			}
+			
+			_scheduler.UpdateTasks(gameState);
+		}
+		
+		private void ChangeToPlayerTurn()
+		{
+			gameState = ChessGameState.PlayerTurn;
+			OnStartPlayerTurnUnityEvent?.Invoke();
+		}
+		
+		private void ChangeToResolvePlayerTurn()
+		{
+			selectedChessPiece = null;
+			gameState = ChessGameState.ResolvingPlayerTurn;
+			OnResolvePlayerTurnUnityEvent?.Invoke();
+		}
+		
+		private void ChangeToResolveEnemyTurn()
+		{
+			gameState = ChessGameState.ResolvingEnemyTurn;
+			OnResolveEnemyTurnUnityEvent?.Invoke();
+		}
+		
+		private void ChangeToEnemyTurn()
+		{
+			gameState = ChessGameState.EnemyTurn;
+			OnStartEnemyTurnUnityEvent?.Invoke();
 		}
 
 		private void ProcessPlayerTurn()
@@ -209,6 +244,37 @@ namespace _Prototyping.Chess
 			_cachedSelectable = selectable;
 			_cachedPreviousSelectable = previousSelectable;
 		}
+
+		private void ProcessResolvePlayerTurn()
+		{
+			if (_scheduler.CheckCanMoveToNextGameState(ChessGameState.ResolvingPlayerTurn))
+			{
+				ChangeToEnemyTurn();
+			}
+		}
+		
+		private void ProcessEnemyTurn()
+		{
+			(ChessPiece selectedPiece, ChessPiece targetPiece, int influenceDifference) bestPieceTake = GetBestPossiblePieceTake(enemyChessPieces);
+			if (bestPieceTake.selectedPiece != null && bestPieceTake.targetPiece != null)
+			{
+				EnemyMovePieceToCell(bestPieceTake.selectedPiece, bestPieceTake.targetPiece.cell);
+				return;
+			}
+			
+			// TODO: Add support to find best possible setup move, before defaulting to a random move
+			
+			(ChessPiece selectedPiece, ChessBoardCell targetCell) randomMove = GetRandomMove(enemyChessPieces);
+			EnemyMovePieceToCell(randomMove.selectedPiece, randomMove.targetCell);
+		}
+
+		private void ProcessResolveEnemyTurn()
+		{
+			if (_scheduler.CheckCanMoveToNextGameState(ChessGameState.ResolvingEnemyTurn))
+			{
+				ChangeToPlayerTurn();
+			}
+		}
 		
 		private void OnSelectedPieceChangedMethod(ChessPiece piece)
 		{
@@ -218,67 +284,10 @@ namespace _Prototyping.Chess
 
 		private void PlayerMovePieceToCell(ChessPiece piece, ChessBoardCell cell)
 		{
+			_scheduler.AddScheduledTask(ChessGameState.ResolvingPlayerTurn, new PlayerMovePieceTask(this, chessBoard, piece, cell));
 			ChangeToResolvePlayerTurn();
-			if (!cell.isEmpty && !cell.chessPiece.isPlayerControlled)
-			{
-				OnPlayerPieceTakenUnityEvent?.Invoke(cell.chessPiece);
-				cell.chessPiece.Kill(piece);
-			}
-
-			piece.MoveToCell(cell);
-			chessBoard.PrintBoardState();
-			ChangeToEnemyTurn();
-		}
-
-		private void ChangeToPlayerTurn()
-		{
-			// If moving from an incorrect game state, do not proceed.
-			if (gameState == ChessGameState.PlayerTurn || gameState == ChessGameState.EnemyTurn)
-				return;
-
-			gameState = ChessGameState.PlayerTurn;
-			OnStartPlayerTurnUnityEvent?.Invoke();
 		}
 		
-		private void ChangeToResolvePlayerTurn()
-		{
-			// If moving from an incorrect game state, do not proceed.
-			if (gameState != ChessGameState.PlayerTurn)
-				return;
-
-			selectedChessPiece = null;
-			gameState = ChessGameState.ResolvingPlayerTurn;
-			OnResolvePlayerTurnUnityEvent?.Invoke();
-		}
-		
-		private void ChangeToEnemyTurn()
-		{
-			// If moving from an incorrect game state, do not proceed.
-			if (gameState == ChessGameState.PlayerTurn || gameState == ChessGameState.EnemyTurn)
-				return;
-
-			gameState = ChessGameState.EnemyTurn;
-			OnStartEnemyTurnUnityEvent?.Invoke();
-		}
-
-		private void ProcessEnemyTurn()
-		{
-			(ChessPiece selectedPiece, ChessPiece targetPiece, int influenceDifference) bestPieceTake = GetBestPossiblePieceTake(enemyChessPieces);
-			if (bestPieceTake.selectedPiece != null && bestPieceTake.targetPiece != null)
-			{
-				Debug.Log("Found attack move!");
-				EnemyMovePieceToCell(bestPieceTake.selectedPiece, bestPieceTake.targetPiece.cell);
-				return;
-			}
-			
-			// TODO: Add support to find best possible setup move, before defaulting to a random move
-			
-			(ChessPiece selectedPiece, ChessBoardCell targetCell) randomMove = GetRandomMove(enemyChessPieces);
-			Debug.Log("Moving random piece");
-			EnemyMovePieceToCell(randomMove.selectedPiece, randomMove.targetCell);
-			
-		}
-
 		private (ChessPiece selectedPiece, ChessPiece targetPiece, int influenceDifference) GetBestPossiblePieceTake(List<ChessPiece> piecesToCheck)
 		{
 			int bestInfluenceDiff = -999;
@@ -286,7 +295,6 @@ namespace _Prototyping.Chess
 			ChessPiece targetPieceToTake = null;
 			foreach (ChessPiece piece in piecesToCheck)
 			{
-				Debug.Log("Checking piece: "+piece);
 				ChessPiece highestInfluenceTakeablePiece = FindHighestInfluencePiece(chessBoard.GetListOfTakeablePieces(piece));
 				if (highestInfluenceTakeablePiece != null)
 				{
@@ -332,6 +340,7 @@ namespace _Prototyping.Chess
 			ChessPiece chosenPieceToMove = null;
 			ChessBoardCell targetCell = null;
 
+			// TODO: Fill this out with an algorithm that goes through each piece and tries to find a move that creates the best piece take next turn
 
 			return (chosenPieceToMove, targetCell);
 		}
@@ -355,27 +364,10 @@ namespace _Prototyping.Chess
 		
 		private void EnemyMovePieceToCell(ChessPiece piece, ChessBoardCell cell)
 		{
+			_scheduler.AddScheduledTask(ChessGameState.ResolvingEnemyTurn, new EnemyMovePieceTask(this, chessBoard, piece, cell));
 			ChangeToResolveEnemyTurn();
-			Debug.Log($"[{nameof(ChessManager)}] Move piece {piece} to cell {cell.gridCoordinates}");
-			if (!cell.isEmpty && cell.chessPiece.isPlayerControlled)
-			{
-				OnEnemyPieceTakenUnityEvent?.Invoke(cell.chessPiece);
-				Debug.Log($"[{nameof(ChessManager)}] Kill piece {cell.chessPiece}");
-				cell.chessPiece.Kill(piece);
-			}
-			piece.MoveToCell(cell);
-			chessBoard.PrintBoardState();
-			ChangeToPlayerTurn();
 		}
 		
-		private void ChangeToResolveEnemyTurn()
-		{
-			// If moving from an incorrect game state, do not proceed.
-			if (gameState != ChessGameState.EnemyTurn)
-				return;
-
-			gameState = ChessGameState.ResolvingEnemyTurn;
-			OnResolveEnemyTurnUnityEvent?.Invoke();
-		}
+		
 	}
 }

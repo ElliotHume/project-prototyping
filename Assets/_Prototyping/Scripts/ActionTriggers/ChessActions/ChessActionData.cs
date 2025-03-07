@@ -7,9 +7,9 @@ namespace _Prototyping.ActionTriggers.ChessActions
 	{
 		public ChessManager chessManager;
 		public ChessBoard chessBoard;
-		public ChessPiece triggeredPiece;
+		public ChessPiece piece;
+		
 		public ChessPiece triggeringPiece;
-
 		public List<ChessPiece> affectedPieces;
 	}
 }
