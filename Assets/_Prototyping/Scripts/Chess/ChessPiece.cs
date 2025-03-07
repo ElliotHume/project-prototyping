@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using _Prototyping.Chess.Core;
 using _Prototyping.Chess.Movement;
@@ -39,6 +40,9 @@ namespace _Prototyping.Chess
 		public int y => gridCoordinates.y;
 
 		public UnityEvent<ChessBoardCell> OnChangedCells;
+
+		public Action<ChessPiece> OnThisPieceTaken;
+		public Action<ChessPiece> OnPieceTakeOther;
 
 		private ChessManager _chessManager;
 		public ChessManager chessManager
@@ -92,8 +96,9 @@ namespace _Prototyping.Chess
 			return coordinateOptions;
 		}
 
-		public void Kill()
+		public void Kill(ChessPiece killer)
 		{
+			OnThisPieceTaken?.Invoke(killer);
 			if (_deathVFXPrefab != null)
 				Instantiate(_deathVFXPrefab, transform.position, transform.rotation);
 			ChessManager.Instance.UnregisterChessPiece(this);

@@ -222,7 +222,7 @@ namespace _Prototyping.Chess
 			if (!cell.isEmpty && !cell.chessPiece.isPlayerControlled)
 			{
 				OnPlayerPieceTakenUnityEvent?.Invoke(cell.chessPiece);
-				cell.chessPiece.Kill();
+				cell.chessPiece.Kill(piece);
 			}
 
 			piece.MoveToCell(cell);
@@ -361,7 +361,7 @@ namespace _Prototyping.Chess
 			{
 				OnEnemyPieceTakenUnityEvent?.Invoke(cell.chessPiece);
 				Debug.Log($"[{nameof(ChessManager)}] Kill piece {cell.chessPiece}");
-				cell.chessPiece.Kill();
+				cell.chessPiece.Kill(piece);
 			}
 			piece.MoveToCell(cell);
 			chessBoard.PrintBoardState();
