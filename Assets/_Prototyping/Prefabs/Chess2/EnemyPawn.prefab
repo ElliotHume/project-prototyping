@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1427451786980721857}
   - component: {fileID: 2323793030120027025}
   - component: {fileID: 210997234965470670}
+  - component: {fileID: -5129885280960405438}
   m_Layer: 0
   m_Name: EnemyPawn
   m_TagString: Untagged
@@ -50,9 +51,10 @@ MonoBehaviour:
   _config: {fileID: 11400000, guid: 68061609f50909f4d8f3a1e98aca376c, type: 2}
   <isPlayerControlled>k__BackingField: 0
   <chessPieceSelectable>k__BackingField: {fileID: 2323793030120027025}
+  <chessPieceActionTriggerHandler>k__BackingField: {fileID: 0}
   _tileSnapPointTransform: {fileID: 3245589939533675431}
   _deathVFXPrefab: {fileID: 0}
-  OnChangedCells:
+  OnChangedCellsUnityEvent:
     m_PersistentCalls:
       m_Calls: []
   <cell>k__BackingField: {fileID: 0}
@@ -619,6 +621,21 @@ MonoBehaviour:
     - {x: -0.6959634, y: 0.1768332, z: -0.6959634}
     - {x: -0.34139428, y: 0.6646524, z: -0.66459554}
     - {x: -0.17685792, y: 0.6958694, z: -0.6960511}
+--- !u!114 &-5129885280960405438
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2910008478244899524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cb5f5b8c4b44237be0141bebcfcb2f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _chessPiece: {fileID: 1427451786980721857}
+  _initialSetup:
+    _serializedList: []
 --- !u!1 &6412734714271327498
 GameObject:
   m_ObjectHideFlags: 0

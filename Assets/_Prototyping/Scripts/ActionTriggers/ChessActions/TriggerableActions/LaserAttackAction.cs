@@ -1,16 +1,14 @@
-using System;
-using _Prototyping.ActionTriggers.ChessActions.Interfaces;
-using _Prototyping.ActionTriggers.Core;
 using UnityEngine;
 
 namespace _Prototyping.ActionTriggers.ChessActions.TriggerableActions
 {
-	public class LaserAttackAction : ScriptableObject, IChessTriggerableAction
+	[CreateAssetMenu(fileName = "LaserAttackAction", menuName = "PROTO/Chess/TriggerableActions/LaserAttackAction")]
+	public class LaserAttackAction : ChessTriggerableAction
 	{
-		public Action<IActionTrigger<ChessActionData>> OnActionTriggered { get; set; }
-		public void Trigger(ChessActionData triggerData)
+		public override void Trigger(ChessActionData triggerData)
 		{
 			Debug.Log("TRIGGERED A LASER ATTACK");
+			OnActionTriggered?.Invoke(triggerData);
 		}
 	}
 }

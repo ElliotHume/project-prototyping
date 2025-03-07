@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using _Prototyping.ActionTriggers.ChessActions;
 using _Prototyping.Chess.Core;
 using _Prototyping.Chess.Movement;
 using _Prototyping.Grids.Core;
@@ -19,6 +20,9 @@ namespace _Prototyping.Chess
 		
 		[field: SerializeField]
 		public ChessPieceSelectable chessPieceSelectable { get; private set; }
+		
+		[field: SerializeField]
+		public ChessPieceActionTriggerHandler chessPieceActionTriggerHandler { get; private set; }
 
 		[SerializeField]
 		private Transform _tileSnapPointTransform;
@@ -64,6 +68,8 @@ namespace _Prototyping.Chess
 			movementOptions = new List<ChessMovementType>(_config.movementOptions);
 			if (chessPieceSelectable == null)
 				chessPieceSelectable = GetComponentInChildren<ChessPieceSelectable>();
+			if (chessPieceActionTriggerHandler == null)
+				chessPieceActionTriggerHandler = GetComponentInChildren<ChessPieceActionTriggerHandler>();
 			
 			ChessManager.Instance.RegisterChessPiece(this);
 		}

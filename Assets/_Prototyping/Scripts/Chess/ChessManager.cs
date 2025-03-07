@@ -103,6 +103,7 @@ namespace _Prototyping.Chess
 		{
 			if (!chessPieces.Contains(chessPiece))
 			{
+				chessPiece.chessPieceActionTriggerHandler.Initialize(this, chessBoard);
 				chessPieces.Add(chessPiece);
 				OnRegisteredChessPiece?.Invoke(chessPiece);
 			}
@@ -112,6 +113,7 @@ namespace _Prototyping.Chess
 		{
 			if (chessPieces.Contains(chessPiece))
 			{
+				chessPiece.chessPieceActionTriggerHandler.Cleanup();
 				chessPieces.Remove(chessPiece);
 				OnUnregisteredChessPiece?.Invoke(chessPiece);
 			}
