@@ -125,12 +125,12 @@ namespace _Prototyping.Chess
 		}
 
 		// TODO: replace boolean with an enum for what kind of attack it was (piece take, AoE attack, etc...)
-		public void KillPieceOnCell(ChessBoardCell targetCell, bool isPieceTake = true)
+		public void KillPieceOnCell(ChessBoardCell targetCell, ChessPiece killerPiece, bool isPieceTake = true)
 		{
 			if (!targetCell.isEmpty)
 			{
 				Debug.Log($"[{nameof(ChessManager)}] Kill piece {targetCell.chessPiece}");
-				targetCell.chessPiece.Kill(targetCell.chessPiece);	
+				targetCell.chessPiece.Kill(killerPiece);	
 			}
 		}
 		
