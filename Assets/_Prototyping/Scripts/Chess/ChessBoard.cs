@@ -58,7 +58,6 @@ namespace _Prototyping.Chess
 						startPosition + new Vector3(_spaceBetweenCells * i, 0, _spaceBetweenCells * j), rotation,
 						transform);
 					spawnedCell.Instantiate(this, coordinates);
-					Debug.Log("SPAWNED CELL");
 					cells.Add(coordinates, spawnedCell);
 				}
 			}

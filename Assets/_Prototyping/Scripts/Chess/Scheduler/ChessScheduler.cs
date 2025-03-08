@@ -7,6 +7,8 @@ namespace _Prototyping.Chess.Scheduler
 	public class ChessScheduler : MonoBehaviour
 	{
 		public static ChessScheduler Instance;
+
+		private ChessManager _chessManager;
 		
 		public Action<IChessScheduledTask> OnTaskFinished;
 		
@@ -28,6 +30,14 @@ namespace _Prototyping.Chess.Scheduler
 			{
 				queue.Enqueue(task);
 			}
+		}
+
+		public void AddTaskToCurrentSchedule(IChessScheduledTask task)
+		{
+			if (_chessManager == null)
+				_chessManager = ChessManager.Instance;
+			
+			AddScheduledTask(_chessManager.gameState, task);
 		}
 
 		public void UpdateTasks(ChessManager.ChessGameState currentGameState)
