@@ -3,9 +3,9 @@ using _Prototyping.Chess;
 
 namespace _Prototyping.ActionTriggers.ChessActions.Interfaces
 {
-	public interface IChessActionTrigger : IActionTrigger<ChessActionData>
+	public interface IChessActionTrigger<T> : IActionTrigger<ChessActionData>
 	{
-		public void Initialize(ChessManager chessManager, ChessBoard chessBoard, ChessPiece piece);
+		public T InitializeInstance(ChessManager chessManager, ChessBoard chessBoard, ChessPiece piece);
 		public void CleanUp();
 	}
 }

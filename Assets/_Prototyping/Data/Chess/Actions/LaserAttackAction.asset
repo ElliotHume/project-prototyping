@@ -12,3 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9738443f6cce4c2eb5516ecdedda1f1f, type: 3}
   m_Name: LaserAttackAction
   m_EditorClassIdentifier: 
+  direction: {x: 0, y: 1}
+  stopOnHit: 1
+  friendlyFireEnabled: 1
+  laserAttackVisualsPrefab: {fileID: 3765362688186582831, guid: b94b306b843346b4a9274c696daa4dcc, type: 3}

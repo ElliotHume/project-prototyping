@@ -7,11 +7,14 @@ namespace _Prototyping.ActionTriggers.ChessActions.Triggers
 	[CreateAssetMenu(fileName = "OnPieceMovedTrigger", menuName = "PROTO/Chess/Triggers/OnPieceMovedTrigger")]
 	public class OnPieceMovedTrigger : ChessActionTrigger
 	{
-		public override void Initialize(ChessManager chessManager, ChessBoard chessBoard, ChessPiece chessPiece)
-		{
-			base.Initialize(chessManager, chessBoard, base.chessPiece);
+		private const string _triggerId = "OnPieceMovedTrigger";
+		public override string triggerId => _triggerId;
 
-			chessPiece.OnChangedCellsUnityEvent.AddListener(TriggerActions);
+		public override ChessActionTrigger InitializeInstance(ChessManager chessManager, ChessBoard chessBoard, ChessPiece chessPiece)
+		{
+			OnPieceMovedTrigger instance = (OnPieceMovedTrigger)base.InitializeInstance(chessManager, chessBoard, chessPiece);
+			chessPiece.OnChangedCellsUnityEvent.AddListener(instance.TriggerActions);
+			return instance;
 		}
 		
 		private void TriggerActions(ChessBoardCell movedToCell)
@@ -21,8 +24,7 @@ namespace _Prototyping.ActionTriggers.ChessActions.Triggers
 				chessManager = chessManager,
 				chessBoard = chessBoard,
 				piece = chessPiece,
-				
-				paramCells = new List<ChessBoardCell>(){movedToCell},
+				cell = movedToCell,
 			});
 		}
 		

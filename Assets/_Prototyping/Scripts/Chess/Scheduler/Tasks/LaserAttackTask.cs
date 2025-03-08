@@ -47,9 +47,12 @@ namespace _Prototyping.Chess.Scheduler.Tasks
 			taskState = IChessScheduledTask.ScheduledTaskState.Executing;
 			_targetCells = new List<ChessBoardCell>();
 			
+			Debug.Log(JsonUtility.ToJson(this));
+			
 			_laserVisual = GameObject.Instantiate(laserVisualPrefab, cell.piecePositionTransform.position, cell.piecePositionTransform.rotation);
 			FindTarget();
 			_laserVisual.Initialize(cell, _stopCell, direction);
+			Debug.Log($"Laser visual - startCell [{cell.gridCoordinates}], endCell [{(_stopCell == null ? "off-board" : _stopCell.gridCoordinates)}]");
 		}
 
 		private void FindTarget()
