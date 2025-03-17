@@ -17,13 +17,13 @@ namespace _Prototyping.PointerSelectables
 		public bool isHovered { get; private set; }
 		public bool isSelected { get; private set; }
 		[field: SerializeField]
-		public UnityEvent OnHoverStart { get; set; }
+		public UnityEvent OnHoverStartUnityEvent { get; set; }
 		[field: SerializeField]
-		public UnityEvent OnHoverEnd { get; set; }
+		public UnityEvent OnHoverEndUnityEvent { get; set; }
 		[field: SerializeField]
-		public UnityEvent OnSelectionStart { get; set; }
+		public UnityEvent OnSelectionStartUnityEvent { get; set; }
 		[field: SerializeField]
-		public UnityEvent OnSelectionEnd { get; set; }
+		public UnityEvent OnSelectionEndUnityEvent { get; set; }
 
 		private void Start()
 		{
@@ -34,25 +34,25 @@ namespace _Prototyping.PointerSelectables
 		public void StartHover()
 		{
 			isHovered = true;
-			OnHoverStart?.Invoke();
+			OnHoverStartUnityEvent?.Invoke();
 		}
 
 		public void EndHover()
 		{
 			isHovered = false;
-			OnHoverEnd?.Invoke();
+			OnHoverEndUnityEvent?.Invoke();
 		}
 
 		public void StartSelection()
 		{
 			isSelected = true;
-			OnSelectionStart?.Invoke();
+			OnSelectionStartUnityEvent?.Invoke();
 		}
 
 		public void EndSelection()
 		{
 			isSelected = false;
-			OnSelectionEnd?.Invoke();
+			OnSelectionEndUnityEvent?.Invoke();
 		}
 		
 		#endregion

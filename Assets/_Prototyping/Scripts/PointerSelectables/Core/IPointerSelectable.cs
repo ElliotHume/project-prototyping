@@ -9,10 +9,10 @@ namespace _Prototyping.PointerSelectables.Core
 		public bool isHovered { get; }
 		public bool isSelected { get; }
 		
-		public UnityEvent OnHoverStart { get; set; }
-		public UnityEvent OnHoverEnd { get; set; }
-		public UnityEvent OnSelectionStart { get; set; }
-		public UnityEvent OnSelectionEnd { get; set; }
+		public UnityEvent OnHoverStartUnityEvent { get; set; }
+		public UnityEvent OnHoverEndUnityEvent { get; set; }
+		public UnityEvent OnSelectionStartUnityEvent { get; set; }
+		public UnityEvent OnSelectionEndUnityEvent { get; set; }
 		
 		public void StartHover();
 		public void EndHover();

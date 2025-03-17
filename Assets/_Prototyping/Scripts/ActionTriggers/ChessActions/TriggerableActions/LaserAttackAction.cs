@@ -15,8 +15,6 @@ namespace _Prototyping.ActionTriggers.ChessActions.TriggerableActions
 		
 		public override void Trigger(ChessActionData triggerData)
 		{
-			Debug.Log($"Firing a laser at cell [{triggerData.cell.gridCoordinates}]-pos:[{triggerData.cell.piecePositionTransform.position}] with direction [{direction}]", triggerData.cell);
-			
 			ChessScheduler.Instance.AddTaskToCurrentSchedule(
 				new LaserAttackTask(triggerData.chessManager, triggerData.chessBoard, triggerData.piece, triggerData.cell, direction, stopOnHit, friendlyFireEnabled, laserAttackVisualsPrefab));
 			OnActionTriggered?.Invoke(triggerData);

@@ -105,6 +105,8 @@ namespace _Prototyping.Chess
 		public void Kill(ChessPiece killer)
 		{
 			OnThisPieceTaken?.Invoke(killer);
+			killer.OnPieceTakeOther?.Invoke(this);
+			
 			if (_deathVFXPrefab != null)
 				Instantiate(_deathVFXPrefab, transform.position, transform.rotation);
 			ChessManager.Instance.UnregisterChessPiece(this);
