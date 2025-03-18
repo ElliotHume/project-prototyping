@@ -36,7 +36,7 @@ namespace _Prototyping.Chess.Scheduler.Tasks
 			if (!cell.isEmpty && !cell.chessPiece.isPlayerControlled)
 			{
 				chessManager.OnEnemyPieceTakenUnityEvent?.Invoke(cell.chessPiece);
-				cell.chessPiece.Kill(piece);
+				board.KillPieceOnCell(cell, piece);
 			}
 
 			piece.MoveToCell(cell);

@@ -134,7 +134,6 @@ namespace _Prototyping.Chess
 			}
 		}
 		
-
 		public void PrintBoardState()
 		{
 			string stateString = "-------------------Board State------------------------";

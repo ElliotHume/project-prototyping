@@ -109,6 +109,8 @@ namespace _Prototyping.Chess
 			
 			if (_deathVFXPrefab != null)
 				Instantiate(_deathVFXPrefab, transform.position, transform.rotation);
+			
+			cell.SetPiece(null);
 			ChessManager.Instance.UnregisterChessPiece(this);
 			Destroy(gameObject);
 		}

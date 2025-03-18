@@ -18,7 +18,7 @@ namespace _Prototyping.Chess
 		public ChessPiece chessPiece { get; private set; }
 		public bool isEmpty => chessPiece == null;
 
-		public UnityEvent<ChessPiece> OnPieceMovedToCell;
+		public UnityEvent<ChessPiece> OnPieceMovedToCellUnityEvent;
 		
 		private ChessTileVisuals _chessTileVisuals;
 
@@ -43,7 +43,7 @@ namespace _Prototyping.Chess
 		public void SetPiece(ChessPiece piece)
 		{
 			chessPiece = piece;
-			OnPieceMovedToCell?.Invoke(chessPiece);
+			OnPieceMovedToCellUnityEvent?.Invoke(chessPiece);
 		}
 	}
 }
