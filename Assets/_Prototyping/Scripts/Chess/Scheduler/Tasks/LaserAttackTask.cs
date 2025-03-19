@@ -109,5 +109,10 @@ namespace _Prototyping.Chess.Scheduler.Tasks
 			if (_laserVisual != null)
 				GameObject.Destroy(_laserVisual.gameObject);
 		}
+		
+		public void CancelTask()
+		{
+			EndTask();
+		}
 	}
 }

@@ -47,6 +47,12 @@ namespace _Prototyping.Chess
 		public bool canPlayerAct => gameState == ChessGameState.PlayerTurn && _scheduler.CheckCanMoveToNextGameState(gameState);
 		public bool canEnemyAct => gameState == ChessGameState.EnemyTurn && _scheduler.CheckCanMoveToNextGameState(gameState);
 
+		public Dictionary<ChessPiece, PlayerMovePieceTask> playerMovePieceTasks;
+		public Dictionary<ChessPiece, EnemyMovePieceTask> enemyMovePieceTasks;
+
+		public Action<ChessPiece> OnPlayerPieceMoveTasksChanged;
+		public Action<ChessPiece> OnEnemyPieceMoveTasksChanged;
+
 		public UnityEvent onPauseGameUnityEvent;
 		public UnityEvent OnStartPlayerTurnUnityEvent;
 		public UnityEvent OnResolvePlayerTurnUnityEvent;
@@ -76,6 +82,8 @@ namespace _Prototyping.Chess
 		{
 			Instance = this;
 			chessPieces = new List<ChessPiece>();
+			playerMovePieceTasks = new Dictionary<ChessPiece, PlayerMovePieceTask>();
+			enemyMovePieceTasks = new Dictionary<ChessPiece, EnemyMovePieceTask>();
 		}
 
 		private void Start()
@@ -204,6 +212,8 @@ namespace _Prototyping.Chess
 			if (selectable == previousSelectable)
 				return;
 
+			Debug.Log($"[{selectable == _cachedSelectable}]  [{previousSelectable == _cachedPreviousSelectable}]");
+
 			if (selectable is ChessPieceSelectable chessPieceSelectable)
 			{
 				// If the selectable piece is player controlled, switch the selected piece to it
@@ -213,18 +223,15 @@ namespace _Prototyping.Chess
 					
 					// If the selected new piece is player controlled, switch control to that piece
 					selectedChessPiece = chessPieceSelectable.chessPiece;
-					return;
 				}
-				
 				// If the selectable is not player controlled, check if we previously had selected a player piece
-				if (previousSelectable is ChessPieceSelectable previousChessPieceSelectable)
+				else if (previousSelectable is ChessPieceSelectable previousChessPieceSelectable)
 				{
 					if (previousChessPieceSelectable.chessPiece.isPlayerControlled)
 					{
 						if (chessBoard.CanPieceTakeOther(previousChessPieceSelectable.chessPiece, chessPieceSelectable.chessPiece))
 						{
 							PlayerMovePieceToCell(previousChessPieceSelectable.chessPiece, chessPieceSelectable.chessPiece.cell);
-							return;
 						}
 					}
 				}
@@ -237,12 +244,11 @@ namespace _Prototyping.Chess
 						if (chessBoard.CanPieceMoveToCell(previousChessPieceSelectable.chessPiece, chessBoardCellSelectable.cell))
 						{
 							PlayerMovePieceToCell(previousChessPieceSelectable.chessPiece, chessBoardCellSelectable.cell);
-							return;
 						}
 					}
 				}
 			}
-
+			
 			_cachedSelectable = selectable;
 			_cachedPreviousSelectable = previousSelectable;
 		}
@@ -257,17 +263,20 @@ namespace _Prototyping.Chess
 		
 		private void ProcessEnemyTurn()
 		{
-			(ChessPiece selectedPiece, ChessPiece targetPiece, int influenceDifference) bestPieceTake = GetBestPossiblePieceTake(enemyChessPieces);
-			if (bestPieceTake.selectedPiece != null && bestPieceTake.targetPiece != null)
+			foreach (ChessPiece enemyPiece in enemyChessPieces)
 			{
-				EnemyMovePieceToCell(bestPieceTake.selectedPiece, bestPieceTake.targetPiece.cell);
-				return;
+				(ChessPiece targetPiece, int influenceDifference)? bestTake = GetBestPossiblePieceTake(enemyPiece);
+				if (bestTake.HasValue)
+				{
+					EnemyMovePieceToCell(enemyPiece, bestTake.Value.targetPiece.cell);
+				}
+				else
+				{
+					ChessBoardCell randomMove = GetRandomMove(enemyPiece);
+					EnemyMovePieceToCell(enemyPiece, randomMove);
+				}
 			}
-			
-			// TODO: Add support to find best possible setup move, before defaulting to a random move
-			
-			(ChessPiece selectedPiece, ChessBoardCell targetCell) randomMove = GetRandomMove(enemyChessPieces);
-			EnemyMovePieceToCell(randomMove.selectedPiece, randomMove.targetCell);
+			EndEnemyTurn();
 		}
 
 		private void ProcessResolveEnemyTurn()
@@ -286,32 +295,65 @@ namespace _Prototyping.Chess
 
 		private void PlayerMovePieceToCell(ChessPiece piece, ChessBoardCell cell)
 		{
-			_scheduler.AddScheduledTask(ChessGameState.ResolvingPlayerTurn, new PlayerMovePieceTask(this, chessBoard, piece, cell));
+			AddPlayerMoveTask(piece, new PlayerMovePieceTask(this, chessBoard, piece, cell));
+		}
+
+		private void AddPlayerMoveTask(ChessPiece piece, PlayerMovePieceTask task, bool cancelPrevious = true)
+		{
+			if (cancelPrevious && playerMovePieceTasks.ContainsKey(piece))
+				CancelPlayerMoveTask(piece);
+			
+			_scheduler.AddScheduledTask(ChessGameState.ResolvingPlayerTurn, task);
+			playerMovePieceTasks.Add(piece, task);
+			OnPlayerPieceMoveTasksChanged?.Invoke(piece);
+		}
+
+		private void CancelPlayerMoveTask(ChessPiece piece)
+		{
+			if (!playerMovePieceTasks.ContainsKey(piece))
+				return;
+			
+			_scheduler.RemoveTask(playerMovePieceTasks[piece], ChessGameState.ResolvingPlayerTurn);
+			playerMovePieceTasks.Remove(piece);
+			OnPlayerPieceMoveTasksChanged?.Invoke(piece);
+		}
+
+		public void EndPlayerTurn()
+		{ 
 			ChangeToResolvePlayerTurn();
 		}
 		
-		private (ChessPiece selectedPiece, ChessPiece targetPiece, int influenceDifference) GetBestPossiblePieceTake(List<ChessPiece> piecesToCheck)
+		private (ChessPiece selectedPiece, ChessPiece targetPiece, int influenceDifference) GetBestPossiblePieceTakeForSet(List<ChessPiece> piecesToCheck)
 		{
 			int bestInfluenceDiff = -999;
 			ChessPiece chosenPieceToMove = null;
 			ChessPiece targetPieceToTake = null;
 			foreach (ChessPiece piece in piecesToCheck)
 			{
-				ChessPiece highestInfluenceTakeablePiece = FindHighestInfluencePiece(chessBoard.GetListOfTakeablePieces(piece));
-				if (highestInfluenceTakeablePiece != null)
+				(ChessPiece targetPiece, int influenceDifference)? bestPieceTake = GetBestPossiblePieceTake(piece);
+				if (bestPieceTake.HasValue)
 				{
-					int influenceDiff = highestInfluenceTakeablePiece.influence - piece.influence;
-					if (influenceDiff > bestInfluenceDiff)
+					if (bestPieceTake.Value.influenceDifference > bestInfluenceDiff)
 					{
-						bestInfluenceDiff = influenceDiff;
+						bestInfluenceDiff = bestPieceTake.Value.influenceDifference;
 						chosenPieceToMove = piece;
-						targetPieceToTake = highestInfluenceTakeablePiece;
+						targetPieceToTake = bestPieceTake.Value.targetPiece;
 					}
 				}
 			}
 
 			return (chosenPieceToMove, targetPieceToTake, bestInfluenceDiff);
-		} 
+		}
+
+		private (ChessPiece targetPiece, int influenceDifference)? GetBestPossiblePieceTake(
+			ChessPiece pieceToCheck)
+		{
+			ChessPiece highestInfluenceTakeablePiece = FindHighestInfluencePiece(chessBoard.GetListOfTakeablePieces(pieceToCheck));
+			if (highestInfluenceTakeablePiece != null)
+				return (highestInfluenceTakeablePiece, highestInfluenceTakeablePiece.influence - pieceToCheck.influence);
+			
+			return null;
+		}
 
 		private ChessPiece FindHighestInfluencePiece(List<ChessPiece> pieces)
 		{
@@ -347,7 +389,7 @@ namespace _Prototyping.Chess
 			return (chosenPieceToMove, targetCell);
 		}
 
-		private (ChessPiece selectedPiece, ChessBoardCell targetCell) GetRandomMove(List<ChessPiece> piecesToCheck)
+		private (ChessPiece selectedPiece, ChessBoardCell targetCell) GetRandomMoveInSet(List<ChessPiece> piecesToCheck)
 		{
 			if (piecesToCheck.Count == 0)
 				return (null, null);
@@ -355,21 +397,27 @@ namespace _Prototyping.Chess
 			int randomIndex = Random.Range(0, piecesToCheck.Count);
 			
 			ChessPiece selectedPiece = piecesToCheck[randomIndex];
-			List<Vector2Int> possibleMovementOptions = selectedPiece.GetPossibleMovementOptionCoordinates();
-			
-			randomIndex = Random.Range(0, possibleMovementOptions.Count);
-			ChessBoardCell targetCell = chessBoard.cells[possibleMovementOptions[randomIndex]];
 
-			return (selectedPiece, targetCell);
+			return (selectedPiece, GetRandomMove(selectedPiece));
+		}
+
+		private ChessBoardCell GetRandomMove(ChessPiece piece)
+		{
+			List<Vector2Int> possibleMovementOptions = piece.GetPossibleMovementOptionCoordinates();
+			int randomIndex = Random.Range(0, possibleMovementOptions.Count);
+			ChessBoardCell targetCell = chessBoard.cells[possibleMovementOptions[randomIndex]];
+			return targetCell;
 		}
 		
 		
 		private void EnemyMovePieceToCell(ChessPiece piece, ChessBoardCell cell)
 		{
 			_scheduler.AddScheduledTask(ChessGameState.ResolvingEnemyTurn, new EnemyMovePieceTask(this, chessBoard, piece, cell));
+		}
+
+		private void EndEnemyTurn()
+		{
 			ChangeToResolveEnemyTurn();
 		}
-		
-		
 	}
 }

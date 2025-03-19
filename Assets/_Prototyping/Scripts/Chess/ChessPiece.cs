@@ -24,8 +24,8 @@ namespace _Prototyping.Chess
 		[field: SerializeField]
 		public ChessPieceActionTriggerHandler chessPieceActionTriggerHandler { get; private set; }
 
-		[SerializeField]
-		private Transform _tileSnapPointTransform;
+		[field: SerializeField]
+		public Transform tilePointTransform { get; private set; }
 
 		[SerializeField]
 		private GameObject _deathVFXPrefab;
@@ -70,6 +70,8 @@ namespace _Prototyping.Chess
 				chessPieceSelectable = GetComponentInChildren<ChessPieceSelectable>();
 			if (chessPieceActionTriggerHandler == null)
 				chessPieceActionTriggerHandler = GetComponentInChildren<ChessPieceActionTriggerHandler>();
+			if (tilePointTransform == null)
+				tilePointTransform = transform;
 			
 			ChessManager.Instance.RegisterChessPiece(this);
 		}

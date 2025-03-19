@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace _Prototyping.Chess.Scheduler
@@ -38,6 +39,12 @@ namespace _Prototyping.Chess.Scheduler
 				_chessManager = ChessManager.Instance;
 			
 			AddScheduledTask(_chessManager.gameState, task);
+		}
+
+		public void RemoveTask(IChessScheduledTask task, ChessManager.ChessGameState turn)
+		{
+			task.CancelTask();
+			_turnQueues[turn] = new Queue<IChessScheduledTask>(_turnQueues[turn].Where(s => s != task));
 		}
 
 		public void UpdateTasks(ChessManager.ChessGameState currentGameState)

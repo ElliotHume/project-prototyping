@@ -33,5 +33,10 @@ namespace _Prototyping.Chess.Scheduler
 		/// End the task, cleaning up what is necessary, called once.
 		/// </summary>
 		public void EndTask();
+
+		/// <summary>
+		/// Cancel the task before it naturally finishes, called once.
+		/// </summary>
+		public void CancelTask();
 	}
 }

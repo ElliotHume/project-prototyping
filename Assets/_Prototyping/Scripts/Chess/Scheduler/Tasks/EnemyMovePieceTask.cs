@@ -47,5 +47,10 @@ namespace _Prototyping.Chess.Scheduler.Tasks
 		{
 			// Do nothing, nothing to do
 		}
+		
+		public void CancelTask()
+		{
+			EndTask();
+		}
 	}
 }
